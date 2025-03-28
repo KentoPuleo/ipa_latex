@@ -1,0 +1,9 @@
+\babel@toc {english}{}\relax 
+\thispagestyle {fancy}
+\contentsline {part}{\numberline {I}Appendix}{1}{part.1}%
+\contentsline {chapter}{\numberline {A}List of acronyms}{2}{appendix.A}%
+\contentsline {chapter}{\numberline {B}Index of used aid}{3}{appendix.B}%
+\contentsline {chapter}{\numberline {C}Glossary}{4}{appendix.C}%
+\contentsline {chapter}{\numberline {D}List of figures}{5}{appendix.D}%
+\contentsline {chapter}{\numberline {E}List of Tables}{6}{appendix.E}%
+\contentsline {chapter}{\numberline {F}List of sources}{7}{appendix.F}%
