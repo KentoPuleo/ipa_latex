@@ -1,4 +1,4 @@
-\documentclass[10pt, oneside]{scrbook}
+\documentclass[10pt, oneside, numbers=noenddot, chapterprefix=true, chapterformat=kapitel]{scrbook}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % This is the LaTeX template of Jonas Schultheiss. It'll be used for the IPA and VA.
@@ -23,7 +23,7 @@
 \newcommand{\docdate}{\today}
 \newcommand{\docname}{EcoHub Testautomation und Mapping}
 \newcommand{\compiledfilename}{ipa\_kp\_pax\_2025.pdf}
-\newcommand{\task}{Individualle praktische Arbeit} % e.g. Modul 152/IPA/...
+\newcommand{\task}{Individuelle praktische Arbeit} % e.g. Modul 152/IPA/...
 \newcommand{\taskname}{Entwicklung einer Testautomation für die EcoHub-Plattform \\
  und Implementierung von Mapping-Funktionen}
 \newcommand{\clientlogopath}{./images/pax-logo.png}
@@ -50,8 +50,8 @@
   headheight=35mm
 ]{geometry}
 \usepackage[utf8]{inputenc}
-\usepackage[babel,english]{csquotes}
-\usepackage[english]{babel}
+\usepackage[babel,german]{csquotes}
+\usepackage[ngerman]{babel}
 \usepackage{acronym}
 \usepackage[section]{placeins}
 \usepackage[Conny]{fncychap}
@@ -97,7 +97,13 @@
 \definecolor{lightgray}{RGB}{224,224,224}
 \definecolor{darkgray}{RGB}{192,192,192}
 
-\renewcommand{\listfigurename}{List of figures}
+% German names for lists
+\renewcommand{\listfigurename}{Abbildungsverzeichnis}
+\renewcommand{\listtablename}{Tabellenverzeichnis}
+\renewcommand{\figurename}{Abbildung}
+\renewcommand{\tablename}{Tabelle}
+\renewcommand{\partname}{Teil}
+\renewcommand{\chaptername}{Kapitel}
 
 
 %%%%%%%%%%%%%%%%%%%
@@ -113,7 +119,7 @@
 \fancyfoot{}
 \fancyfoot[L]{\fontsize{10}{11} \selectfont \compiledfilename}
 \fancyfoot[C]{\fontsize{9}{11} \docdate}
-\fancyfoot[R]{\fontsize{10}{11} \selectfont Page \thepage\space of \computelastpage}
+\fancyfoot[R]{\fontsize{10}{11} \selectfont Seite \thepage\space von \computelastpage}
 
 \renewcommand{\headrulewidth}{0pt}
 
