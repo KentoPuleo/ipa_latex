@@ -26,7 +26,13 @@
  und Implementierung von Mapping-Funktionen}
 \newcommand{\clientlogopath}{./images/pax-logo.png}
 \newcommand{\kandidat}{Kento Puleo}
+\newcommand{\berufsbildner}{Sascha Listner}
+\newcommand{\fachkraft}{Kushtrim Mjeku}
+\newcommand{\hauptexperte}{Janick Wüthrich}
+\newcommand{\nebenexperte}{Ralf Horstmöller}
 \newcommand{\docauthor}{\kandidat}
+
+
 
 
 %%%%%%%%%%
@@ -42,8 +48,8 @@
   headheight=35mm
 ]{geometry}
 \usepackage[utf8]{inputenc}
-\usepackage[babel,english]{csquotes}
-\usepackage[english]{babel}
+\usepackage[babel,german]{csquotes}
+\usepackage[ngerman]{babel}
 \usepackage{acronym}
 \usepackage[section]{placeins}
 \usepackage[Conny]{fncychap}
@@ -89,7 +95,13 @@
 \definecolor{lightgray}{RGB}{224,224,224}
 \definecolor{darkgray}{RGB}{192,192,192}
 
-\renewcommand{\listfigurename}{List of figures}
+% German names for lists
+\renewcommand{\listfigurename}{Abbildungsverzeichnis}
+\renewcommand{\listtablename}{Tabellenverzeichnis}
+\renewcommand{\figurename}{Abbildung}
+\renewcommand{\tablename}{Tabelle}
+\renewcommand{\partname}{Teil}
+\renewcommand{\chaptername}{Kapitel}
 
 
 %%%%%%%%%%%%%%%%%%%
@@ -100,12 +112,12 @@
 \renewcommand{\chapterpagestyle}{fancy}
 \renewcommand{\partpagestyle}{fancy}
 \fancyhead{}
-\fancyhead[L]{\fontsize{10}{12}\selectfont\textbf{\task} \\ \fontsize{8}{10} \selectfont \taskname \\ \kandidat}
+\fancyhead[L]{\fontsize{10}{12}\selectfont\textbf{\task} \\ \fontsize{8}{10} \selectfont \taskname \\ Kandidat: \kandidat}
 \fancyhead[R]{\includegraphics[width=4cm]{\clientlogopath}}
 \fancyfoot{}
 \fancyfoot[L]{\fontsize{10}{11} \selectfont \compiledfilename}
 \fancyfoot[C]{\fontsize{9}{11} \docdate}
-\fancyfoot[R]{\fontsize{10}{11} \selectfont Page \thepage\space of \computelastpage}
+\fancyfoot[R]{\fontsize{10}{11} \selectfont Seite \thepage\space von \computelastpage}
 
 \renewcommand{\headrulewidth}{0pt}
 
