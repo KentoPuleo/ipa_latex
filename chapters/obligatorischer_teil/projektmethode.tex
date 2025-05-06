@@ -1,2 +1,80 @@
 \chapter{Projektmethode}
-Beschreibung des Projektmanagements. 
+
+\vspace{-3em}
+
+In diesem Kapitel wird die Wahl der Projektmethodik für die vorliegende Arbeit dargestellt. Zunächst wird auf die intern üblicherweise eingesetzte Projektmethode eingegangen. Anschliessend wird die für dieses Projekt gewählte Vorgehensweise vorgestellt und mit alternativen Methoden verglichen. Abschliessend wird die Entscheidung für die gewählte Methode begründet.
+
+\section{Interne Projektmethode}
+
+In den Softwareentwicklungsteams der Pax wird auf agile Projektmethoden gesetzt. Dabei kommt eine Kombination aus Scrum und Kanban zum Einsatz. Die Projekte werden in Sprints unterteilt, die wiederum in verschiedene Phasen gegliedert sind. Auch typische Scrum-Elemente wie Reviews und Retrospektiven werden regelmäßig durchgeführt.
+
+Zur Steuerung des Arbeitsprozesses wird jedoch ein Kanban-Board verwendet, um die Aufgaben zu visualisieren und den Fortschritt zu verfolgen. So lässt sich nachvollziehen, wer an welcher Aufgabe arbeitet und wie viel Zeit in jede einzelne Aufgabe investiert wird.
+
+Ein Sprint dauert in der Regel etwa drei Wochen und beginnt mit einer Planungsphase. Es folgt eine Umsetzungsphase, die schließlich von einer Testphase abgelöst wird. Am Ende eines Sprints erfolgt eine Reflexion, in der Erfahrungen und Erkenntnisse gesammelt sowie dokumentiert werden.
+
+\section{Gewählte Projektmethode}
+
+\subsection{Die Wasserfallmethode}
+
+Bei der Wasserfallmethode handelt es sich um ein klassisches Projektmanagement-Modell, das besonders in der Softwareentwicklung weit verbreitet ist. Sie folgt einem linearen, sequenziellen Ansatz, bei dem das Projekt in klar abgegrenzte Phasen unterteilt wird. Jede Phase muss vollständig abgeschlossen sein, bevor die nächste beginnt, wodurch der gesamte Projektverlauf strukturiert und gut planbar ist.
+
+Das untenstehende Diagramm des Wasserfallmodells veranschaulicht diesen Ablauf deutlich: Es zeigt, wie die Phasen Anforderungsanalyse, Planung, Umsetzung, Test und Abschluss nacheinander durchlaufen werden. In der Regel erfolgt der Fortschritt nur in eine Richtung – ähnlich wie Wasser, das einen Wasserfall hinabfließt. Dennoch kann es in Ausnahmefällen notwendig sein, zu einer vorherigen Phase zurückzukehren, etwa um entdeckte Fehler oder Fehleinschätzungen zu korrigieren.
+
+\vspace{1em}
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/Wasserfalldiagram}
+    \caption{Wasserfallmodell (Quelle: Eigenerarbeitung)}
+    \label{fig:wasserfall}
+\end{figure}
+
+\subsection{Die Phasen der Wasserfallmethode genauer erklärt}
+
+\textbf{Analyse}\\
+In dieser initialen Phase werden sämtliche funktionalen und nicht-funktionalen Anforderungen erhoben und dokumentiert. Gemeinsam mit allen Stakeholdern werden diese dokumentiert, der Projektumfang definiert und die Ziele festgelegt.
+
+\vspace{1em}
+\textbf{Planung/Design}\\
+Auf Basis der Anforderungen wird die Systemarchitektur konzipiert. Dabei werden alle Komponenten und ihre Schnittstellen definiert, die zu verwendenden Technologien und Frameworks festgelegt sowie Datenmodelle und Datenbankschemas erstellt. 
+
+\vspace{1em}
+\textbf{Implementierung}\\
+In der Implementierungsphase erfolgt die eigentliche Programmierung der Software gemäss der Design-Spezifikation. Die Entwickler erstellen Code nach definierten Standards, implementieren Unit-Tests und dokumentieren den Quellcode entsprechend der Vorgaben.
+
+\vspace{1em}
+\textbf{Test/Qualitätssicherung}\\
+Nach der Fertigstellung der einzelnen Komponenten werden diese zusammengeführt und integriert. Durch umfangreiche Tests wird die Gesamtfunktionalität validiert. Auftretende Fehler werden behoben und die Leistung des Systems optimiert. 
+
+\vspace{1em}
+\textbf{Betrieb/Wartung}\\
+In dieser Phase wird des entwickelte System dem Kunden vorgestellt und zur abnahme bereitgestellt. Bei internen entwicklungen wird die Funktion dem Auftraggeber, meist Buissnesengineer oder Productowner, vorgestellt. Nach der Vorstellung wird die Funktion in die nächste Umgebung deployed und von den entsprechenden Personen abgenommen.
+
+\section{Begründung der Wahl}
+Die Wasserfallmethode wurde gewählt, da die Anforderungen im Vorfeld bereits klar definiert wurden und sich sehr wahrscheinlich nicht ändern werden. Es handelt sich um ein kleines Projekt, welches von einer einzigen Person ausgeführt wird, da ist es wichtig, keine komplexe Methode zu verwenden, welche womöglich viel Zeit oder Strukturierung benötigt.
+
+\section{Vergleich mit agilen Methoden}
+Für dieses Projekt gibt es keine laufenden Rückmeldungen oder Feedbackzyklen, die eine agile Methode rechtfertigen würden. Wie in der Tabelle 2.1: Vergleich zwischen Wasserfall und agilen Methoden zu sehen ist. 
+
+\begin{table}[h]
+\caption{Vergleich zwischen Wasserfall und agilen Methoden}
+\label{tab:methodenvergleich}
+\centering
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{|l|p{5cm}|p{5cm}|}
+\hline
+\textbf{Kriterium} & \textbf{Wasserfall} & \textbf{Agile Methoden} \\
+\hline
+Projektgröße & Ideal für kleine, überschaubare Projekte & Gut für große, komplexe Projekte \\
+\hline
+Anforderungsänderungen & Schwierig zu implementieren & Flexibel und einfach umsetzbar \\
+\hline
+Planung & Detaillierte Vorplanung notwendig & Iterative Planung möglich \\
+\hline
+Teamgröße & Funktioniert gut mit Einzelpersonen & Optimiert für Teams \\
+\hline
+Dokumentation & Umfangreich von Anfang an & Wächst mit dem Projekt \\
+\hline
+Risikomanagement & Risiken werden früh identifiziert & Kontinuierliche Risikobewertung \\
+\hline
+\end{tabular}
+\end{table}

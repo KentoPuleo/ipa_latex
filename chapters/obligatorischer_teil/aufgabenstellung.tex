@@ -1,28 +1,134 @@
 \chapter{Aufgabenstellung im Originaltext}
+\vspace{-3em}
+Im Folgenden Kapitel wird die Detaillierte Aufgabenstellung aus dem PkOrg kopiert, formatiert und gegebenenfalls erweitert.
 
 \section{Titel der Arbeit}
-Titel der individuellen praktischen Arbeit.
+Implementierung von Mapping-Funktionen und Testautomatisierung-API im EcoHub-Service
 
 \section{Ausgangslage}
-Beschreibung der Ausgangssituation.
+EcoHub ist eine Plattform, die die Zusammenarbeit zwischen Makler/Brokern und Versicherungen erleichtert.
+Seitens Pax nutzen wir dabei die Funktionen Single-Sign-On (SSO) und User-Provisioning. Makler melden sich
+bei EcoHub an und können über diese Plattform auf verschiedene Versicherungen zugreifen, mit denen Sie eine
+Service-Vereinbarung haben.
+
+Das geschieht folgendermassen:
+
+\begin{enumerate}
+\item Die Pax ist als Nutzer bei EcoHub angemeldet.
+\item Broker, privat oder einer Organisation, melden sich auch als Nutzer auf EcoHub an.
+\item Der Broker und die Pax können eine Service-Vereinbarung treffen. Dazu müssen beide Parteien der Vereinbarung zustimmen.
+\item Nach der Vereinbarung werden die Broker Daten an die Pax gesendet. Diese prüft, ob die E-Mail des Brokers gespeichert und bekannt ist.
+\item Sollte die E-Mail bekannt sein, wird eine IDP-Nummer von EcoHub angefragt. Diese wird dem Benutzer zugeteilt.
+\item Sollte die E-Mail nicht bekannt sein, wirf die Pax eine Fehlermeldung an EcoHub.
+\item Nachdem die IDP-Nummer dem Broker zugeteilt wurde, kann dieser über die Plattform auf die Pax Seite zugreifen, ohne sich erneut anmelden zu müssen.
+\end{enumerate}
 
 \section{Detaillierte Aufgabenstellung}
-Detaillierte Beschreibung der konkreten Aufgaben.
+Im Rahmen der IPA werden zwei Aspekte des EcoHub-Services weiterentwickelt, um dessen
+Funktionalität und Zuverlässigkeit zu verbessern. Einerseits wird eine Mapping-Funktion
+implementiert, die die automatische und präzise Zuordnung von Nutzern zu Applikationsgruppen
+ermöglicht. Andererseits wird eine umfassende Testautomatisierung auf API-Ebene eingeführt, um
+die Qualität der Schnittstellen systematisch zu prüfen und Fehler frühzeitig zu erkennen.
+
+Beide Massnahmen zielen darauf ab, den Betrieb des EcoHub-Services effizienter zu gestalten, die
+Wartung zu vereinfachen und eine stabile Systemumgebung zu gewährleisten. Die nachfolgenden
+Abschnitte erläutern die Details zu den einzelnen Implementierungen.
+
+\subsection{Mapping-Funktion}
+Die Mapping-Funktion sorgt dafür, dass neu angelegte und bestehende Nutzer ihrer
+Applikationsgruppen zugeordnet werden. Diese Zuordnungen werden im OpenLDAP gespeichert
+und enthalten die eindeutige Kennnummer jedes Nutzers. So wird eine Präzise und nachhaltige
+Zuordnung gewährleistet.
+
+\subsubsection{Testkonzept der Mapping-Funktion}
+Um die Funktionalität der Mapping-Funktion sicherzustellen, wird diese umfassend getestet. Dazu
+gehören:
+\begin{itemize}
+    \item Unit-Tests, um einzelne Komponenten isoliert zu prüfen
+    \item Component-Tests, um die Zusammenarbeit der Module zu evaluieren
+    \item Integration-Tests, die die Funktionalität im Gesamtsystem überprüfen
+\end{itemize}
+Diese Teststufen gewährleisten, dass die Mapping-Funktion fehlerfrei und stabil im Produktivbetrieb läuft.
+
+\subsection{Testautomatisierung}
+\subsubsection{API-Tests}
+Der EcoHub-Service umfasst vier Schnittstellen, die künftig durch Playwright-API-Tests
+systematisch geprüft werden. Ziel ist es, Fehler frühzeitig zu erkennen und die Zuverlässigkeit der
+Schnittstellen sicherzustellen. Bei fehlschlagenden Tests wird eine Benachrichtigung an die
+zuständigen Personen versendet, um eine zeitnahe Problembehebung zu gewährleisten.
+
+\subsubsection{Testumgebung}
+Die Durchführung der Tests erfolgt sowohl in der Testumgebung innerhalb der Continuous
+Deployment (CD) Pipeline als auch lokal. Für die lokale Ausführung wird ein embedded LDAP
+eingesetzt, das eine flexible und unabhängige Testumgebung ermöglicht.
+
+\subsubsection{Testdaten}
+Um die API-Tests zu unterstützen, werden spezifische Testdaten erstellt:
+\begin{itemize}
+    \item Für das lokale Testen werden die Testdaten direkt im Repository hinterlegt
+    \item In der CD-Pipeline wird zusätzlich ein Test-User im bestehenden LDAP-System angelegt, um die Funktionalität unter möglichst realistischen Bedingungen zu prüfen
+\end{itemize}
 
 \section{Mittel und Methode}
-Beschreibung der verwendeten Mittel und Methoden.
+\subsection{Entwicklungsumgebung}
+\begin{itemize}
+    \item Lenovo ThinkPad X1 \hfill Kenntnisse seit 2 Jahre
+    \item Windows 11 \hfill Kenntnisse seit 3 Jahre
+    \item IntelliJ Ultimate \hfill 3 Jahre
+\end{itemize}
+
+\subsection{Versionierungsverwaltung}
+\begin{itemize}
+    \item GitHub \hfill Kenntnisse seit 3 Jahre
+\end{itemize}
 
 \section{Vorkenntnisse}
-Beschreibung der vorhandenen Vorkenntnisse.
+\subsection{Frameworks und Libraries}
+\begin{itemize}
+    \item Playwright \hfill Kenntnisse seit 1/2 Jahre
+    \item SpringBoot \hfill Kenntnisse seit 2 Jahre
+\end{itemize}
+
+\subsection{Programmiersprachen}
+\begin{itemize}
+    \item TypeScript \hfill Kenntnisse seit 3 Jahre
+    \item Java \hfill Kenntnisse seit 3 Jahre
+\end{itemize}
+
+\subsection{Versionierungsverwaltung}
+\begin{itemize}
+    \item GitHub \hfill Kenntnisse seit 3 Jahre
+\end{itemize}
 
 \section{Vorarbeiten}
-Beschreibung der bereits durchgeführten Vorarbeiten.
+Um eine gute und effiziente IPA durchführen zu können, wurden gewisse Vorarbeiten geleistet,
+welche es ermöglichte, Wissen und Erfahrungen zu gewinnen.
+\begin{itemize}
+    \item Dokument Vorlage
+    \item Einarbeitung in die Tools
+\end{itemize}
 
 \section{Neue Lerninhalte}
-Beschreibung der neuen zu erlernenden Inhalte.
+\subsection{Unternehmen}
+Ziel ist es, Fehler frühzeitig zu erkennen und die Zuverlässigkeit der Schnittstellen sicherzustellen.
+Ausserdem soll die Applikationsgruppenzuweisung zukünftige Arbeiten erleichtern und den Nutzern
+die gewünschten Applikationen zur Verfügung stellen.
+
+\subsection{Persönlich}
+\begin{itemize}
+    \item Der Umgang und die Erfahrung Tests auf API-Ebene zuschreiben und Automatisieren
+    \item Repetition und Erweiterung von Java und Springboot wissen
+\end{itemize}
 
 \section{Arbeiten in den letzten sechs Monaten}
-Beschreibung der Arbeiten in den letzten sechs Monaten.
+Die letzten 6 Monate wurden in verschiedene Themen investiert. Folgend die Themen die behandelt
+wurden und die passende Zeitspanne.
+\begin{itemize}
+    \item August \& September: Vergleich und PoC RxJS zu Angular Signals
+    \item Oktober \& November: Testautomatisierung Playwright E2E Pilotversuch
+    \item Dezember: Bekanntmachung mit IPA Thema
+    \item Januar \& Februar: Testautomatisierung API im Brokerportal
+\end{itemize}
 
 \section{Individuelle Kriterien}
 Beschreibung der individuellen Kriterien. 
