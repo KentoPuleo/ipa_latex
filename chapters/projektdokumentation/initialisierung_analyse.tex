@@ -1,10 +1,238 @@
 \chapter{Initialisierung/Analyse}
-Beschreibung der Initialisierungs- und Analysephase. 
-
-\section{Mapping-Funktionen}
-Beschreibung der Mapping-Funktionen. 
-
-\section{Testcases}
-Beschreibung der Testcases. 
+\vspace{-3em}
+In diesem Kapitel wird die aktuelle Ausgangslage analysiert, Schwachstellen identifiziert sowie die angestrebten Ziele und Anforderungen beschrieben.
 
 
+\section{Erweiterung der Ausgangslage}
+\subsection{IST-Stand}
+\label{sec:ist-zustand}
+Benutzer, die sich über die EcoHub-Plattform bei Pax anmelden möchten, müssen aktuell initial manuell über eine interne Eingabemaske im LDAP-Verzeichnis angelegt werden. Dabei wird zwischen Private Vorsorge (PV) und Berufliche Vorsorge (BV) unterschieden. Ein Broker, der durch diese Maske im LDAP erfasst wird, erhält anschliessend die notwendigen Rollen und Gruppen.
+
+Dieser Prozess erfolgt manuell, ist fehleranfällig und verursacht hohen administrativen Aufwand.
+
+Sollte sich ein Broker anmelden wollen, der nicht im LDAP vorhanden ist, scheitert der Vorgang, da aktuell keine automatische Benutzererstellung existiert. Die vorhandene \textit{addUser}-Funktion generiert eine IDP-Nummer, welche für die Durchführung des Single Sign-On (SSO) zwingend erforderlich ist. Die Web Access Management (WAM) prüft im Rahmen des SSO auf das Vorhandensein dieser IDP-Nummer. Fehlt sie, wird der Zugriff verweigert.
+
+Auf der EcoHub-Plattform existieren bereits eigene Berechtigungskonzepte. Diese stimmen grösstenteils mit jenen der Pax überein. Es wird zwischen Einzelleben (EL) und Kollektivleben (KL) unterschieden (siehe Abbildung \ref{fig:rollenEcoHub}). Obwohl diese Rollen über EcoHub zugewiesen werden können, werden sie derzeit nicht automatisch in das LDAP-Verzeichnis übernommen und operativ nicht weiterverwendet
+
+\vspace{1em}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/Rollen_EcoHUb.png}
+    \caption{Rollenmodell auf der EcoHub-Plattform (Quelle: \href{https://miro.com/app/board/uXjVLiokbOs=/?moveToWidget=3458764624384066444&cot=14}{Miro Board})}
+    \label{fig:rollenEcoHub}
+\end{figure}
+
+
+\subsubsection*{Business Process Model der updateUser-Funktion (BPM)}
+Eine \textit{updateUser}-Funktion ist vorhanden, erfüllt jedoch noch nicht die gewünschten Anforderungen hinsichtlich automatischer Rechtezuweisung oder Synchronisierung. Wie in der Abbildung \ref{fig:bpm-ist} zu sehen ist, wird bei der updateUser-Funktion die gleiche Logik wie bei der addUser-Funktion verwendet.
+
+\vspace{1em}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/BPMN_updateUser.png}
+    \caption{Business Process Model des IST-Zustands der Benutzerregistrierung (Quelle: Eigene Darstellung)}
+    \label{fig:bpm-ist}
+\end{figure}
+
+\subsubsection*{Tabelle der zu testenden Endpunkte}
+Hier ist eine Tabelle der zu testenden Endpunkte und deren aktuellen Funktionen zu sehen.
+\begin{longtable}{|p{4cm}|p{10cm}|}
+  \caption{Übersicht der zu testenden Endpunkte} \label{tab:endpoints} \\
+  \hline
+  \textbf{Endpoint} & \textbf{Beschreibung} \\
+  \hline
+  \endfirsthead
+  \multicolumn{2}{c}{Fortsetzung von Tabelle \ref{tab:endpoints}} \\
+  \hline
+  \textbf{Endpoint} & \textbf{Beschreibung} \\
+  \hline
+  \endhead
+  \hline
+  \endfoot
+  addUser & Sucht einen Broker im LDAP-Verzeichnis anhand der E-Mail-Adresse und weist diesem eine IDP-Nummer zu. \\
+  \hline
+  updateUser & Aktualisiert die IDP-Nummer im LDAP-Verzeichnis. \\
+  \hline
+  deleteUser & Entfernt die IDP-Nummer eines Benutzers aus dem LDAP-Verzeichnis. \\
+  \hline
+  getUserStatus & Prüft die Existenz der IDP-Nummer eines Benutzers im LDAP-Verzeichnis. \\
+  \hline
+\end{longtable}
+
+\subsection{Darstellung der Systemstruktur im IST-Stand}
+Folgend wird die Systemstruktur im IST-Stand dargestellt. Diese wird während dieser Arbeit jedoch nicht verändert und dient nur zur Veranschaulichung des aktuellen Zustands.
+\subsubsection*{Systemkontextdiagramm (C1):}  
+Zur Veranschaulichung des IST-Zustands wurde ein C1-Diagramm nach dem C4-Modell erstellt. Dieses stellt die Systemlandschaft im Kontext dar und zeigt die Interaktionen zwischen Benutzer, zentralem Dienst (EcoHub), dem Provisioning Service sowie den Umsystemen.
+
+\vspace{1em}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{images/System-EcoHub_C1.png}
+    \caption{Systemkontext (C1) – IST-Zustand der Benutzerverwaltung (Quelle: Eigene Darstellung)}
+    \label{fig:c1diagramm-ist}
+\end{figure}
+
+\subsubsection*{Container-Diagramm (C2)}
+
+Ergänzend zum Systemkontext (C1) wird in der folgenden Abbildung die interne Struktur des Systems im Sinne eines C2-Diagramms dargestellt. Dieses zeigt die einzelnen technischen Container, deren Hauptaufgaben sowie die Kommunikationsflüsse zwischen ihnen im aktuellen Systemzustand.
+
+\vspace{1em}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/System-EcoHub_C2.png}
+    \caption{C2-Diagramm IST-Zustand – Containerübersicht (Quelle: Eigene Darstellung)}
+    \label{fig:c2diagramm-ist}
+\end{figure}
+
+Die wichtigsten Container im aktuellen System sind:
+
+\begin{itemize}
+    \item \textbf{Web Application Firewall (WAF):}  
+    Führt IP-Whitelisting sowie Zertifikatsprüfungen durch und schützt die Schnittstellen gegenüber dem Internet.
+    
+    \item \textbf{API-Management:}  
+    Verwaltet eingehende API-Anfragen, prüft auf Richtlinien (Policies) und leitet validierte Anfragen an die zuständigen Systeme weiter.
+    
+    \item \textbf{Web Access Management (WAM):}  
+    Übernimmt die zentrale Authentifizierung (SSO) und prüft anhand der IDP-Nummer im LDAP, ob ein Benutzer autorisiert ist.
+    
+    \item \textbf{OpenLDAP:}  
+    Verzeichnisdienst zur Speicherung von Benutzerdaten, insbesondere E-Mail-Adressen und IDP-Nummern.
+    
+    \item \textbf{EcoHub Provisioning Service:}  
+    Eine Spring Boot-Anwendung, bereitgestellt auf Azure Kubernetes (AKS), welche Benutzer über SOAP-Schnittstellen verwalten kann (hinzufügen, aktualisieren, löschen).
+    
+    \item \textbf{PAX Portal:}  
+    Die Zielplattform, auf die Broker nach erfolgreichem Login weitergeleitet werden, wenn alle Prüfungen bestanden wurden.
+\end{itemize}
+
+Die Kommunikation zwischen diesen Containern erfolgt aktuell sequenziell, mit mehreren Prüfungen und Sicherheitsbarrieren. Änderungen oder Fehler in einem der Container können sich direkt auf das Verhalten des Gesamtsystems auswirken.
+
+\subsubsection*{Komponentendiagramm (C3) - EcoHub Provisioning Service}
+\label{sec:c3-diagramm}
+
+Das nachfolgende C3-Diagramm zeigt den internen Aufbau des \textbf{EcoHub Provisioning Service} auf Komponentenebene. Der Service ist eine Spring Boot-Anwendung. Er stellt eine SOAP-Schnittstelle zur Verwaltung von Broker-Benutzern bereit. Die Benutzerverwaltung erfolgt durch Interaktion mit einem extern angebundenen OpenLDAP-Verzeichnisdienst.
+
+\vspace{1em}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/System-EcoHub_C3.png}
+    \caption{C3-Komponentendiagramm – EcoHub Provisioning Service (Quelle: Eigene Darstellung)}
+    \label{fig:c3diagramm}
+\end{figure}
+\vspace{1em}
+
+Die wichtigsten Komponenten im Diagramm sind:
+
+\begin{itemize}
+    \item \textbf{UserProvisioningEndpoint} \\
+    SOAP-Webservice-Endpunkt, der externe Anfragen wie \texttt{addUser}, \texttt{updateUser}, \texttt{deleteUser} oder \texttt{getUserStatus} entgegennimmt.
+
+    \item \textbf{UserProvisioningService} \\
+    Zentrale Geschäftslogik. Validiert die Anfragen, delegiert LDAP-Operationen und erstellt Rückgabemeldungen.
+
+    \item \textbf{ValidationService} \\
+    Führt strukturierte Prüfungen der eingehenden Payloads durch (z.\,B. Pflichtfelder, Formate, Längenbeschränkungen) und verwendet Adapter-Objekte zur Entkopplung vom SOAP-Modell.
+
+    \item \textbf{ResponseCreatorService} \\
+    Baut standardisierte Antwortobjekte (inkl. Fehlermeldungen) zur Rückgabe über SOAP.
+
+    \item \textbf{PersonRepository \& PersonRepositoryImpl} \\
+    Repositories zur Suche, Änderung und Löschung von Nutzerdaten im OpenLDAP-Verzeichnis. Nutzen \texttt{LdapTemplate} von Spring.
+
+    \item \textbf{OpenLDAP (extern)} \\
+    Verzeichnisdienst, der Brokerdaten und ihre Rollen speichert. Wird durch den Provisioning Service gelesen und beschrieben.
+
+    \item \textbf{EcoHub (extern)} \\
+    Die EcoHub-Plattform ruft den Provisioning-Service über eine definierte WSDL-Schnittstelle auf und sendet XML-basierte Requests.
+\end{itemize}
+
+Die Kommunikation erfolgt synchron via SOAP, die Daten werden direkt im LDAP-Verzeichnis persistiert. Alle Komponenten sind lose gekoppelt und durch Interfaces und Adapter abstrahiert, was Testbarkeit und Erweiterbarkeit verbessert.
+
+
+\subsection{Problemanalyse}
+\label{sec:problemanalyse}
+Schwachstellen sind konkrete Mängel oder Probleme im aktuellen System oder Prozess. Sie beschreiben, was heute nicht gut funktioniert und somit den Änderungsbedarf begründet. Darunter fallen aktuell folgende Punkte:
+
+\begin{itemize}
+    \item Der Benutzer muss manuell im LDAP eingetragen werden, was ein hoher Aufwand ist und die manuelle Bearbeitung birgt ein hohes Fehlerrisiko.
+    \item Die Rollen von EcoHub werden nicht im LDAP übernommen, was bedeuten kann, dass Broker im EcoHub andere Berechtigungen haben.
+    \item Es gibt keine Tests auf die Endpunkte des EcoHub-Services. Schlägt ein Endpunkt fehl oder werden Änderungen gemacht, wird der Nutzer es als erstes bemerken.
+\end{itemize}
+
+
+
+\subsection{Chancen und Risiken}
+\label{sec:chancen-risiken}
+Risiken sind mögliche Probleme oder Gefahren, die beim Projektverlauf oder der Umsetzung der Änderung auftreten könnten - also zukünftige Unsicherheiten. Folgende wurden für dieses Projekt erkannt.
+
+\begin{itemize}
+    \item Fehlerhafte Zuordnung von Rollen. Die Mappingfunktion weist den Broker in falsche Gruppen und Rollen.
+    \item Änderung an LDAP-Struktur. Ungründliche Vorbereitung und Arbeiten könnte die LDAP-Struktur verändern.
+    \item Unvollständige Testabdeckung. Werden die Funktionen oder Endpunkte nicht vollständig abgedeckt, kann es weiterhin zu unentdeckten Problemen führen.
+\end{itemize}
+
+
+
+\subsection{Zielsetzung}
+Nun sind verschiedene Ziele für das EcoHub vorgesehen. Der ganze Prozess soll automatisiert geschehen, das bedeutet die manuelle Erstellung der Broker über die Maske fällt weg. 
+Der Broker soll die Möglichkeit bekommen, über das EcoHub sich bei der Pax anzumelden, insofern er eine Service-Vereinbarung eingegangen ist, und damit ein neuer Nutzer im LDAP erstellt und gespeichert wird. 
+Bei der Erstellung wie aber auch nachträglich sollen die Berechtigungen, die der Broker auf der EcoHub-Plattform erhält, die gleichen sein wie die im LDAP. 
+Auch die einzelnen Schnittstellen des EcoHub-Services sollen getestet werden, um Probleme vorzeitig zu erkennen und zu lösen.
+
+\subsection{Abgrenzung}
+\label{sec:abgrenzung}
+Wichtig ist, sich nicht in der eigenen Arbeit zu verlieren oder sich in andere Aufgaben zu verlieren. Die Automatisierung des Prozesses, um einen neuen Broker hinzuzufügen, ist nicht Teil der IPA.
+Auch dass die Gruppen-Zuteilung bei der initialen Anmeldung geschieht, ist nicht Teil der IPA.
+
+\section{Erweiterte Aufgabenstellung}
+Die Aufgabe in dieser IPA bezieht sich auf zwei der Ziele. Es soll eine Mappingfunktion geschrieben werden welche die EcoHub Rollen mit den internen Rollen verbindet. Das soll geschehen sollten sich die Rollen des Broker ändern und ein update nötig sein.
+Auch sollen alle Schnittstellen des EcoHub-Services automatisiert getestet werden, die Automation soll über eine Pipeline laufen.
+
+
+\section{Anforderungen}
+\subsection{Funktionale Anforderungen}
+Bei Funktionalen Anforderungen handelt es sich um das (WAS?). Was soll das System oder Produkt tun, besser gesagt welche Funktionen oder Verhaltensweisen muss es bieten. Folgend die wichtigsten Funktionalen Anforderung im bezug auf die zwei Aufträge.
+\subsubsection{Mapping-Funktion}
+\begin{itemize}
+    \item Der Broker wird entsprechend seiner EcoHub-Rolle den korrekten Gruppen im LDAP zugeordnet.
+    \item Gruppen, in denen der Broker nicht mehr Bestandteil ist, aus denen wird er entfernt.
+    \item Bei nicht bekannten Rollen wird die Anfrage ignoriert und der Broker kriegt keine neuen Berechtigungen.
+    \item Die Funktion muss das Mapping aus einer externen Konfigurationsdatei (z.B. application.yml) laden, damit Änderungen ohne Codeanpassung möglich sind.
+    \item Die Funktion muss mehrere Rollen gleichzeitig verarbeiten können.
+\end{itemize}
+\subsubsection{API-Testautomatisierung}
+\begin{itemize}
+    \item Alle bekannten API-Endpunkte des EcoHub-Provisioning-Services müssen durch automatisierte Tests abgedeckt werden. 
+    \item Die Tests müssen sicherstellen das konkrete Fehlermeldungen zurückgegeben werden.
+    \item Tests müssen jederzeit wiederholbar sein, ohne manuelle Vorbereitung (z.B. Setup- und Teardown-Routinen für Testdaten).
+    \item Die Tests müssen nicht nur wiederholbar sondern auch automatisch durchgeführt werden. 
+\end{itemize}
+
+\subsection{Nicht-funktionale Anforderungen}
+Bei nicht-funktionalen Anforderungen handelt es sich um das (WIE?). Wie soll das System funktionieren und welche Qualität soll dieses bieten.
+\subsubsection{Mapping-Funktion}
+\begin{itemize}
+    \item Die Verarbeitung einer Mapping-Anfrage soll maximal 500 ms dauern.
+    \item Ungültige oder unbekannte Rollen verursachen einen kontrollierten Fehler mit Logging.
+    \item Die Mapping-Logik muss durch Unit-Tests abdeckbar sein.
+\end{itemize}
+\subsubsection{API-Testautomatisierung}
+\begin{itemize}
+    \item Die komplette Testausführung soll in unter 2 Minuten durchführbar sein, um schnelle Feedback-Zyklen zu ermöglichen.
+    \item Für die Tests dürfen keine sensitiven Daten verwendet werden. Es werden Testdaten genutzt, welche nicht mit echten Nutzern in Verbindung gebracht werden können.
+    \item Die Testfälle müssen gut strukturiert, benannt und dokumentiert sein, sodass sie auch von Dritten gepflegt werden können.
+    \item Das Testsystem soll erweiterbar sein, damit neue Endpunkte mit geringem Aufwand integriert werden können.
+\end{itemize}
+
+\section{Rahmenbedingungen und Annahmen}
+Rahmenbedingungen beschreiben äussere Faktoren, die das Projekt nicht aktiv beeinflussen, an die sich aber gehalten werden muss. Sie definieren sozusagen den Spielraum innerhalb des Projekts.
+Folgend sind die Rahmenbedingungen dieser Arbeit:
+
+\begin{enumerate}
+    \item Das bestehende LDAP-System (OpenLDAP) darf nicht strukturell verändert werden (Schema, Gruppenstruktur bleibt gleich).
+    \item Es muss eine bestehende Spring Boot Applikation verwendet werden.
+    \item Es dürfen nur bereits vorhandene Gruppen im LDAP verwendet werden.
+    \item Die Integration erfolgt via SOAP-Schnittstelle des EcoHub.
+    \item Die API-Tests werden mit Playwright gemacht, da Pax weit alle API- und End-to-End-Tests mit Playwright geschrieben werden.
+\end{enumerate}

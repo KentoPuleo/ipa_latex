@@ -1,8 +1,86 @@
 \chapter{Planung/Design}
-Beschreibung der Planungs- und Designphase. 
+\vspace{-3em}
 
-\section{Mapping-Funktionen}
-Beschreibung der Mapping-Funktionen. 
 
-\section{Tests}
-Beschreibung der Tests. 
+Gemäss dem Wasserfallmodell folgt auf die Analysephase die Designphase, in der die geplanten Systemanpassungen detailliert ausgearbeitet werden. Aufbauend auf den zuvor identifizierten Schwächen wird in diesem Kapitel beschrieben, wie die Benutzerverwaltung des EcoHub Provisioning Service funktional erweitert und technisch abgesichert werden soll.
+
+Neben der Erweiterung bestehender Funktionalität steht auch die Einführung automatisierter Tests zur Qualitätssicherung im Fokus. Die folgenden Abschnitte stellen das Zielbild, die geplanten Änderungen auf Komponentenebene sowie die vorgesehenen Massnahmen zur Absicherung und Testbarkeit der Erweiterung vor.
+
+\section{Zielbild und Anforderungen}
+\label{sec:zielbild}
+
+Im Rahmen der zweiten Projektphase werden zwei zentrale Erweiterungen am EcoHub Provisioning Service vorgenommen:
+
+\begin{enumerate}
+    \item Die Funktion \texttt{updateUser} wird um eine automatische Gruppenzuweisung im LDAP erweitert. Die Zuweisung basiert auf den übermittelten Rolleninformationen (\texttt{igRoles}) und erfolgt konfigurierbar über ein YAML-basiertes Mapping.
+    
+    \item Für alle vier vorhandenen SOAP-Endpunkte (\texttt{addUser}, \texttt{updateUser}, \texttt{deleteUser}, \texttt{getUserStatus}) werden API-Tests mit Playwright implementiert. Diese Tests werden in die bestehende CI/CD-Pipeline integriert, um eine frühzeitige Fehlererkennung zu ermöglichen.
+\end{enumerate}
+
+Die Erweiterungen verfolgen das Ziel, die Benutzerverwaltung zu automatisieren und gleichzeitig die Qualitätssicherung durch systematische Tests zu erhöhen. Dabei wird die bestehende Architektur bewusst nur minimal angepasst und auf Wiederverwendbarkeit sowie Konfigurierbarkeit geachtet.
+
+\section{Komponentendesign: Erweiterung von updateUser}
+\label{sec:komponenten}
+
+\section{Konfigurationsdesign: YAML-Mapping}
+\label{sec:konfiguration}
+
+\section{Ablaufbeschreibung der Funktion updateUser}
+\label{sec:updateuser}
+
+\section{Testdesign und API-Abdeckung}
+\label{sec:testdesign}
+
+Zur Sicherstellung der Funktionalität und zur frühzeitigen Fehlererkennung werden für alle vier vorhandenen SOAP-Endpunkte systematische API-Tests eingeführt. Die Tests werden mit dem Framework \textbf{Playwright} entwickelt, welches durch seine Flexibilität sowohl für Web- als auch für API-Tests geeignet ist.
+
+\subsection*{Zielsetzung}
+\begin{itemize}
+    \item Automatisierte Tests für: \texttt{addUser}, \texttt{updateUser}, \texttt{deleteUser}, \texttt{getUserStatus}
+    \item Prüfung auf korrekte Verarbeitung valider Payloads
+    \item Erkennung von Fehlerfällen bei ungültigen oder unvollständigen Eingaben
+    \item Integration in die bestehende GitHub-Actions-Pipeline
+\end{itemize}
+
+\subsection*{Testfälle (Auswahl)}
+\begin{itemize}
+    \item \texttt{addUser} – Nutzer erfolgreich angelegt mit IDP-Nummer
+    \item \texttt{updateUser} – Nutzer aktualisiert und Gruppen gemappt
+    \item \texttt{deleteUser} – Nutzer aus LDAP entfernt
+    \item \texttt{getUserStatus} – Existenzprüfung korrekt durchgeführt
+    \item Fehlerfall – Payload ohne Pflichtfeld \texttt{userId} führt zu spezifischem Fehlercode
+\end{itemize}
+
+Die Test werden im gleichen Repository wie die Anwendung selbst gehalten. Es wird ein separater Ordner für die Tests erstellt. In der CI/CD-Pipeline wird ein dedizierter Job integriert, der die Tests bei jedem Build ausführt. So können fehlerhafte Implementierungen frühzeitig erkannt und rückgemeldet werden.
+
+\section{Backupkonzept \& Versionierung}
+Backupkonzept und eine sicheres Versionierungsverwaltung ist besonders wichtig. Sollten Daten 
+
+\subsection{Backupkonzept}
+Während dieser Arbeit wird die 3-2-1-1-0-Methode verwendet. Diese ist eine moderne Erweiterung der klassischen 3-2-1-Methode.
+In der 3-2-1-Methode stehen die einzelnen Zahlen für folgende Regeln.
+
+\begin{itemize}
+    \item [3.] Mindestens drei Kopien
+    \item [2.] Auf mindestens zwei verschiedenen Medientypen. (z.B. Lokale Festplatte und Cloud)
+    \item [1.] Und mindestens eine Kopie muss an einem geografisch anderen Standort sein.  
+\end{itemize}
+
+Das Ziel dieser Methode ist es, einerseits eine sichere Datenenerhältlichkeit zu gewährleisten und ebenfalls bei Problemen keine Daten zu verlieren.
+
+In der modernen 3-2-1-1-0-Methode werden zwei neue Regeln hinzugefügt.
+
+\begin{itemize}
+    \item [1.] Mindestens eine Kopie sollte offline sein, also nicht mit dem Netzwerk verbunden und unveränderlich. 
+    \item [0.] Die Kopien dürfen keine Fehler aufweisen und werden dafür regelmässig getestet.   
+\end{itemize}
+
+Mit den neuen zwei Regeln werden die Daten nun auch gegen Ransomeware oder menschliche Fehler geschützt.
+Auch das Testen der Backups wird gefordert, um ungewünschte Überraschungen zu vermeiden.
+
+\subsection{Versionierung}
+In dieser Arbeit wird für die Versionierung Git mit der Online-Plattform Github verwendet.
+
+Git ist ein verteiltes Versionskontrollsystem, mit dem Entwickler den Verlauf von Änderungen an Dateien \- insbesondere Quellcode \- nachverfolgen können. Es ermöglicht mehrere parallele Entwicklungszweige, erleichtert das Zusammenführen von Änderungen und unterstützt das Arbeiten im Team ohne Datenverlust.
+
+GitHub ist  die dazu passende Online-Plattform, die Git-Repositories hostet. Sie bietet zusätzliche Funktionen wie Benutzeroberfläche, Pull Requests, Issue-Tracking und CI/CD-Integration. GitHub erleichtert die Zusammenarbeit an Softwareprojekten und macht den Code öffentlich oder privat zugänglich.
+
