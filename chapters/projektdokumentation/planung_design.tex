@@ -22,8 +22,31 @@ Die Erweiterungen verfolgen das Ziel, die Benutzerverwaltung zu automatisieren u
 \section{Komponentendesign: Erweiterung von updateUser}
 \label{sec:komponenten}
 
+Die überarbeitete Version der \texttt{updateUser}-Funktion wurde im Rahmen der Design-Phase neu konzipiert und in einem BPMN-ähnlichen Ablaufdiagramm visualisiert (siehe Abbildung \ref{fig:updateUserSOLL}). Im Vergleich zum bisherigen Zustand wurde der Ablauf erweitert und strukturiert automatisiert. Neu wird der Benutzer aus allen bestehenden Gruppen entfernt, um eine fehlerfreie Neuzuordnung zu ermöglichen. 
+
+Die zentrale Neuerung besteht in der rollenbasierten Gruppenzuweisung: Anhand der im Payload enthaltenen \texttt{igRoles} und eines in der Konfiguration definierten Mappings wird der Benutzer automatisch den korrekten Gruppen (z.B. \texttt{BROKERPORTAL}, \texttt{VERTRAGSSERVICE}) hinzugefügt. Abschliessend wird die IDP-Nummer im LDAP aktualisiert. Fehlerhafte oder unvollständige Anfragen führen in einen klar definierten Fehlerpfad mit entsprechender Fehlermeldung.
+
+Die neue Struktur ist robuster, besser wartbar und reduziert manuelle Eingriffe erheblich.
+
+\vspace{1em}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/BPMN_updateUser_SOLL.png} 
+    \caption{BPMN-Diagramm der updateUser-Funktion (Quelle: Eigene Darstellung)}
+    \label{fig:updateUserSOLL}
+\end{figure}
+
 \section{Konfigurationsdesign: YAML-Mapping}
 \label{sec:konfiguration}
+
+Um eine zentrale und flexible Steuerung der Gruppenzuweisung im LDAP-Verzeichnis zu ermöglichen, wird ein rollenbasiertes Mapping über die Konfigurationsdatei \texttt{application.yml} realisiert. Diese Konfiguration erlaubt es, bestimmte Rollenpräfixe, wie sie im SOAP-Payload unter \texttt{igRoles} übermittelt werden, vordefinierten Gruppen im LDAP-Verzeichnis zuzuordnen.
+
+Die Gruppen befinden sich unter dem in der Konfiguration definierten \texttt{groupSearchBase} \texttt{ou=groups,dc=paxportal,dc=ch}. Für jede Rollenfamilie (z.\,B. \texttt{EL\_} für externe Brokerrollen oder \texttt{KL\_} für interne Service-Rollen) kann eine Liste von Gruppen angegeben werden, in welche Benutzer automatisch aufgenommen werden sollen, sofern die Rolle im Payload enthalten ist.
+
+Nachfolgend ein exemplarischer Ausschnitt aus der Konfiguration:
+
+
+Die Trennung der Rollenpräfixe (\texttt{EL\_}, \texttt{KL\_}, etc.) erlaubt eine strukturierte und erweiterbare Verwaltung zukünftiger Rollentypen. Änderungen oder Erweiterungen im Gruppenzuweisungsprozess können dadurch ohne Codeänderung direkt über die Konfigurationsdatei vorgenommen werden, was die Wartbarkeit und Transparenz der Benutzerverwaltung deutlich erhöht.
 
 \section{Ablaufbeschreibung der Funktion updateUser}
 \label{sec:updateuser}
@@ -52,32 +75,9 @@ Zur Sicherstellung der Funktionalität und zur frühzeitigen Fehlererkennung wer
 
 Die Test werden im gleichen Repository wie die Anwendung selbst gehalten. Es wird ein separater Ordner für die Tests erstellt. In der CI/CD-Pipeline wird ein dedizierter Job integriert, der die Tests bei jedem Build ausführt. So können fehlerhafte Implementierungen frühzeitig erkannt und rückgemeldet werden.
 
-\section{Backupkonzept \& Versionierung}
-Backupkonzept und eine sicheres Versionierungsverwaltung ist besonders wichtig. Sollten Daten 
+\section{ Versionierung}
+Eine sicheres Versionierungsverwaltung ist besonders wichtig, sollten Daten verloren gehen, kann diese Sicherung die Daten wiederherstellen.
 
-\subsection{Backupkonzept}
-Während dieser Arbeit wird die 3-2-1-1-0-Methode verwendet. Diese ist eine moderne Erweiterung der klassischen 3-2-1-Methode.
-In der 3-2-1-Methode stehen die einzelnen Zahlen für folgende Regeln.
-
-\begin{itemize}
-    \item [3.] Mindestens drei Kopien
-    \item [2.] Auf mindestens zwei verschiedenen Medientypen. (z.B. Lokale Festplatte und Cloud)
-    \item [1.] Und mindestens eine Kopie muss an einem geografisch anderen Standort sein.  
-\end{itemize}
-
-Das Ziel dieser Methode ist es, einerseits eine sichere Datenenerhältlichkeit zu gewährleisten und ebenfalls bei Problemen keine Daten zu verlieren.
-
-In der modernen 3-2-1-1-0-Methode werden zwei neue Regeln hinzugefügt.
-
-\begin{itemize}
-    \item [1.] Mindestens eine Kopie sollte offline sein, also nicht mit dem Netzwerk verbunden und unveränderlich. 
-    \item [0.] Die Kopien dürfen keine Fehler aufweisen und werden dafür regelmässig getestet.   
-\end{itemize}
-
-Mit den neuen zwei Regeln werden die Daten nun auch gegen Ransomeware oder menschliche Fehler geschützt.
-Auch das Testen der Backups wird gefordert, um ungewünschte Überraschungen zu vermeiden.
-
-\subsection{Versionierung}
 In dieser Arbeit wird für die Versionierung Git mit der Online-Plattform Github verwendet.
 
 Git ist ein verteiltes Versionskontrollsystem, mit dem Entwickler den Verlauf von Änderungen an Dateien \- insbesondere Quellcode \- nachverfolgen können. Es ermöglicht mehrere parallele Entwicklungszweige, erleichtert das Zusammenführen von Änderungen und unterstützt das Arbeiten im Team ohne Datenverlust.
