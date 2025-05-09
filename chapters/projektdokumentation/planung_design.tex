@@ -43,11 +43,11 @@ Zur Sicherstellung der Funktionalität und zur frühzeitigen Fehlererkennung wer
 
 \subsection*{Testfälle (Auswahl)}
 \begin{itemize}
-    \item \texttt{addUser} – Nutzer erfolgreich angelegt mit IDP-Nummer
-    \item \texttt{updateUser} – Nutzer aktualisiert und Gruppen gemappt
-    \item \texttt{deleteUser} – Nutzer aus LDAP entfernt
-    \item \texttt{getUserStatus} – Existenzprüfung korrekt durchgeführt
-    \item Fehlerfall – Payload ohne Pflichtfeld \texttt{userId} führt zu spezifischem Fehlercode
+    \item \texttt{addUser} - Nutzer erfolgreich angelegt mit IDP-Nummer
+    \item \texttt{updateUser} - Nutzer aktualisiert und Gruppen gemappt 
+    \item \texttt{deleteUser} - Nutzer aus LDAP entfernt
+    \item \texttt{getUserStatus} - Existenzprüfung korrekt durchgeführt
+    \item Fehlerfall - Payload ohne Pflichtfeld \texttt{userId} führt zu spezifischem Fehlercode
 \end{itemize}
 
 Die Test werden im gleichen Repository wie die Anwendung selbst gehalten. Es wird ein separater Ordner für die Tests erstellt. In der CI/CD-Pipeline wird ein dedizierter Job integriert, der die Tests bei jedem Build ausführt. So können fehlerhafte Implementierungen frühzeitig erkannt und rückgemeldet werden.
