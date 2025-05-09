@@ -22,8 +22,47 @@ Auf der EcoHub-Plattform existieren bereits eigene Berechtigungskonzepte. Diese 
     \label{fig:rollenEcoHub}
 \end{figure}
 
+\subsection{LDAP-Verzeichnisstruktur}
+\label{sec:ldap-struktur}
 
-\subsubsection*{Business Process Model der updateUser-Funktion (BPM)}
+Zur besseren Nachvollziehbarkeit der bestehenden Benutzerverwaltung wurde im Rahmen der Analysephase auch die aktuelle LDAP-Struktur untersucht. Abbildung~\ref{fig:ldap-struktur} zeigt den lokalen Aufbau des LDAP-Verzeichnisses im Projektkontext.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\textwidth]{images/LDAP_Struktur_lokal.png} 
+    \caption{LDAP-Verzeichnisstruktur im lokalen Setup (Datenbeispiel mit Dummies)}
+    \label{fig:ldap-struktur}
+\end{figure}
+
+Die Struktur gliedert sich wie folgt:
+
+\begin{itemize}
+    \item \textbf{Basis-Domain:} \texttt{dc=paxportal,dc=ch}
+    \item \textbf{Organisatorische Einheiten (OUs):}
+    \begin{itemize}
+        \item \texttt{ou=groups}: Enthält LDAP-Gruppen, welche externen Rollen zugewiesen sind. Die Gruppen folgen dem Namensschema \texttt{cn=EXTERNPAX\_A\_<ROLLE>} und bilden verschiedene Anwendungen wie \texttt{BROKERPORTAL}, \texttt{LOGISMATA\_B2B} oder \texttt{QUICKSALE} ab.
+        \item \texttt{ou=people}: Beinhaltet Benutzerobjekte, unterteilt in:
+        \begin{itemize}
+            \item \texttt{ou=Makler}: für Broker-Nutzer
+            \item \texttt{ou=Mitarbeiter\_AD}: für interne AD-Mitarbeitende
+            \item \texttt{ou=Mitarbeiter\_GS}: für weitere interne Mitarbeitende
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+
+Die im Bild gezeigten Benutzereinträge (\texttt{uid=laura.schmidt}, \texttt{uid=hans.muster} etc.) sind \textbf{ausschliesslich Dummy-Daten} und dienen lediglich der Veranschaulichung.
+
+\subsubsection*{Relevanz für das Projekt}
+
+Diese LDAP-Struktur ist zentral für den \textit{EcoHub Provisioning Service}, welcher Benutzer automatisiert erstellt, aktualisiert oder löscht. Dabei ist besonders die rollenbasierte Gruppenzuweisung entscheidend: Über ein externes Mapping (z.\,B. \texttt{EL\_}, \texttt{KL\_}) wird gesteuert, in welche Gruppen ein Benutzer aufgenommen wird.
+
+\subsubsection*{Datenschutz und Veröffentlichung}
+
+Vor der Integration dieser Struktur in das GitHub-Repository wurde geprüft, ob die \texttt{cn}-Bezeichner der Gruppen bedenkenlos veröffentlicht werden dürfen. Diese Klärung war notwendig, um sicherzustellen, dass keine vertraulichen oder geschützten Produktionsinformationen offengelegt werden. Die hier gezeigte Struktur ist vollständig anonymisiert und enthält keine personenbezogenen oder produktiven Daten.
+
+
+
+\subsection{Business Process Model der updateUser-Funktion (BPM)}
 Eine \textit{updateUser}-Funktion ist vorhanden, erfüllt jedoch noch nicht die gewünschten Anforderungen hinsichtlich automatischer Rechtezuweisung oder Synchronisierung. Wie in der Abbildung \ref{fig:bpm-ist} zu sehen ist, wird bei der updateUser-Funktion die gleiche Logik wie bei der addUser-Funktion verwendet.
 
 \vspace{1em}
@@ -34,8 +73,8 @@ Eine \textit{updateUser}-Funktion ist vorhanden, erfüllt jedoch noch nicht die 
     \label{fig:bpm-ist}
 \end{figure}
 
-\subsubsection*{Tabelle der zu testenden Endpunkte}
-Hier ist eine Tabelle der zu testenden Endpunkte und deren aktuellen Funktionen zu sehen.
+\subsection{Tabelle der zu testenden Endpunkte}
+Die folgende Tabelle gibt einen Überblick über die zu testenden Endpunkte und beschreibt deren aktuelle Funktionalitäten.
 \begin{longtable}{|p{4cm}|p{10cm}|}
   \caption{Übersicht der zu testenden Endpunkte} \label{tab:endpoints} \\
   \hline
@@ -61,7 +100,7 @@ Hier ist eine Tabelle der zu testenden Endpunkte und deren aktuellen Funktionen 
 
 \subsection{Darstellung der Systemstruktur im IST-Stand}
 Folgend wird die Systemstruktur im IST-Stand dargestellt. Diese wird während dieser Arbeit jedoch nicht verändert und dient nur zur Veranschaulichung des aktuellen Zustands.
-\subsubsection*{Systemkontextdiagramm (C1):}  
+\subsubsection*{Systemkontextdiagramm (C1)}  
 Zur Veranschaulichung des IST-Zustands wurde ein C1-Diagramm nach dem C4-Modell erstellt. Dieses stellt die Systemlandschaft im Kontext dar und zeigt die Interaktionen zwischen Benutzer, zentralem Dienst (EcoHub), dem Provisioning Service sowie den Umsystemen.
 
 \vspace{1em}
@@ -226,8 +265,7 @@ Bei nicht-funktionalen Anforderungen handelt es sich um das (WIE?). Wie soll das
 \end{itemize}
 
 \section{Rahmenbedingungen und Annahmen}
-Rahmenbedingungen beschreiben äussere Faktoren, die das Projekt nicht aktiv beeinflussen, an die sich aber gehalten werden muss. Sie definieren sozusagen den Spielraum innerhalb des Projekts.
-Folgend sind die Rahmenbedingungen dieser Arbeit:
+Rahmenbedingungen beschreiben äussere Faktoren und definieren den Spielraum, der das Projekt nicht aktiv beeinflusst, an den sich aber gehalten werden muss. Für diese Arbeit gelten folgende Rahmenbedingungen:
 
 \begin{enumerate}
     \item Das bestehende LDAP-System (OpenLDAP) darf nicht strukturell verändert werden (Schema, Gruppenstruktur bleibt gleich).
