@@ -36,20 +36,50 @@ Die neue Struktur ist robuster, besser wartbar und reduziert manuelle Eingriffe 
     \label{fig:updateUserSOLL}
 \end{figure}
 
-\section{Konfigurationsdesign: YAML-Mapping}
-\label{sec:konfiguration}
+\subsection{Konfigurationsdesign: YAML-Mapping}
+\label{sec:yaml-mapping}
 
 Um eine zentrale und flexible Steuerung der Gruppenzuweisung im LDAP-Verzeichnis zu ermöglichen, wird ein rollenbasiertes Mapping über die Konfigurationsdatei \texttt{application.yml} realisiert. Diese Konfiguration erlaubt es, bestimmte Rollenpräfixe, wie sie im SOAP-Payload unter \texttt{igRoles} übermittelt werden, vordefinierten Gruppen im LDAP-Verzeichnis zuzuordnen.
 
-Die Gruppen befinden sich unter dem in der Konfiguration definierten \texttt{groupSearchBase} \texttt{ou=groups,dc=paxportal,dc=ch}. Für jede Rollenfamilie (z.\,B. \texttt{EL\_} für externe Brokerrollen oder \texttt{KL\_} für interne Service-Rollen) kann eine Liste von Gruppen angegeben werden, in welche Benutzer automatisch aufgenommen werden sollen, sofern die Rolle im Payload enthalten ist.
+Die Gruppen befinden sich unter dem in der Konfiguration definierten \texttt{groupSearchBase} \texttt{ou=groups,dc=paxportal,dc=ch}. Für jede Rollenfamilie (z.\,B. \texttt{EL\_} für Einzelleben oder \texttt{KL\_} für Kollektivleben) ist eine Liste von Gruppen hinterlegt, in die Benutzer automatisch aufgenommen werden, sofern die entsprechende Rolle im Payload enthalten ist.
 
-Nachfolgend ein exemplarischer Ausschnitt aus der Konfiguration:
+Die Abkürzungen EL und KL orientieren sich an der fachlichen Struktur der Pax:
+\begin{itemize}
+  \item \textbf{EL} steht für \emph{Einzelleben} und entspricht der \emph{Privaten Vorsorge (PV)}.
+  \item \textbf{KL} steht für \emph{Kollektivleben} und entspricht der \emph{Beruflichen Vorsorge (BV)}.
+\end{itemize}
 
+Die farbliche Markierung der Gruppen in Abbildung \ref{fig:ldapgruppen} veranschaulicht die Zuordnung:
+\begin{itemize}
+  \item Gelb markierte Gruppen gehören zur Kategorie \textbf{EL}.
+  \item Rot markierte Gruppen gehören zur Kategorie \textbf{KL}.
+\end{itemize}
 
-Die Trennung der Rollenpräfixe (\texttt{EL\_}, \texttt{KL\_}, etc.) erlaubt eine strukturierte und erweiterbare Verwaltung zukünftiger Rollentypen. Änderungen oder Erweiterungen im Gruppenzuweisungsprozess können dadurch ohne Codeänderung direkt über die Konfigurationsdatei vorgenommen werden, was die Wartbarkeit und Transparenz der Benutzerverwaltung deutlich erhöht.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5 \textwidth]{images/ldapgruppen_passendmarkiert.png}
+    \caption{LDAP-Gruppen mit farblicher Zuordnung zu EL (gelb) und KL (rot)}
+    \label{fig:ldapgruppen}
+\end{figure}
 
-\section{Ablaufbeschreibung der Funktion updateUser}
-\label{sec:updateuser}
+Nachfolgend ein exemplarischer Auszug aus der Konfiguration:
+
+\begin{lstlisting}[caption={Auszug aus der YAML-Konfiguration für rollenbasiertes Mapping}, label={lst:role-mapping}]
+ecohub:
+  ldap:
+    groupSearchBase: ou=groups,dc=paxportal,dc=ch
+    roleMappings:
+      EL_:
+        - cn=EXTERNPAX_A_BROKERPORTAL,ou=groups
+        - cn=EXTERNPAX_A_QUICKSALE,ou=groups
+        - cn=EXTERNPAX_A_LOGISMATA_B2B,ou=groups
+        - cn=EXTERNPAX_A_BROKERDASHBOARD,ou=groups
+      KL_:
+        - cn=EXTERNPAX_A_VERTRAGSSERVICE,ou=groups
+\end{lstlisting}
+
+Alle weiteren Gruppen, die in der Darstellung ersichtlich sind, aber nicht in der YAML-Konfiguration aufgeführt werden, stehen aktuell in keinem direkten Zusammenhang mit den für dieses Projekt relevanten Applikationen und wurden daher im Rahmen des Designs nicht berücksichtigt. Das Mapping kann jedoch jederzeit erweitert werden, sollte sich dies in Zukunft ändern.
+
 
 \section{Testdesign und API-Abdeckung}
 \label{sec:testdesign}
@@ -65,13 +95,81 @@ Zur Sicherstellung der Funktionalität und zur frühzeitigen Fehlererkennung wer
 \end{itemize}
 
 \subsection*{Testfälle (Auswahl)}
-\begin{itemize}
-    \item \texttt{addUser} - Nutzer erfolgreich angelegt mit IDP-Nummer
-    \item \texttt{updateUser} - Nutzer aktualisiert und Gruppen gemappt 
-    \item \texttt{deleteUser} - Nutzer aus LDAP entfernt
-    \item \texttt{getUserStatus} - Existenzprüfung korrekt durchgeführt
-    \item Fehlerfall - Payload ohne Pflichtfeld \texttt{userId} führt zu spezifischem Fehlercode
-\end{itemize}
+\begin{table}[H]
+\centering
+\caption{Testfälle für den Endpoint \texttt{updateUser} mit Input und erwarteter Ausgabe}
+\label{tab:testcases-updateUser}
+\begin{tabular}{|p{1.2cm}|p{3cm}|p{4cm}|p{6.5cm}|}
+\hline
+\textbf{ID} & \textbf{Titel} & \textbf{Beschreibung} & \textbf{Details} \\
+\hline
+
+\multirow{2}{*}{TC01} & \multirow{2}{*}{EL\_ Benutzer} & \multirow{2}{*}{Benutzer mit EL\_ Rolle soll mehreren Gruppen zugewiesen werden} & 
+\textbf{SOAP Request (Input):} 
+\begin{lstlisting}[language=XML]
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+  <soapenv:Body>
+    <user:updateUserType>
+      <idpUserId>el123</idpUserId>
+      <userEmail>el.user@pax.ch</userEmail>
+      <igRoles>EL_BROKER</igRoles>
+    </user:updateUserType>
+  </soapenv:Body>
+</soapenv:Envelope>
+\end{lstlisting} \\
+\cline{4-4}
+& & & 
+\textbf{Expected Output (z.B. Gruppenmitgliedschaften):}
+\begin{lstlisting}[language=XML]
+<soapenv:Envelope ...>
+  <soapenv:Body>
+    <user:updateUserResponse>
+      <status>SUCCESS</status>
+      <groups>
+        <group>EXTERNPAX_A_BROKERPORTAL</group>
+        <group>EXTERNPAX_A_QUICKSALE</group>
+        <group>EXTERNPAX_A_LOGISMATA_B2B</group>
+        <group>EXTERNPAX_A_BROKERDASHBOARD</group>
+      </groups>
+    </user:updateUserResponse>
+  </soapenv:Body>
+</soapenv:Envelope>
+\end{lstlisting} \\
+\hline
+
+\multirow{2}{*}{TC02} & \multirow{2}{*}{KL\_ Benutzer} & \multirow{2}{*}{Benutzer mit KL\_ Rolle soll nur VERTRAGSSERVICE zugewiesen bekommen} & 
+\textbf{SOAP Request (Input):}
+\begin{lstlisting}[language=XML]
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+  <soapenv:Body>
+    <user:updateUserType>
+      <idpUserId>kl456</idpUserId>
+      <userEmail>kl.user@pax.ch</userEmail>
+      <igRoles>KL_SERVICE</igRoles>
+    </user:updateUserType>
+  </soapenv:Body>
+</soapenv:Envelope>
+\end{lstlisting} \\
+\cline{4-4}
+& & &
+\textbf{Expected Output:}
+\begin{lstlisting}[language=XML]
+<soapenv:Envelope ...>
+  <soapenv:Body>
+    <user:updateUserResponse>
+      <status>SUCCESS</status>
+      <groups>
+        <group>EXTERNPAX_A_VERTRAGSSERVICE</group>
+      </groups>
+    </user:updateUserResponse>
+  </soapenv:Body>
+</soapenv:Envelope>
+\end{lstlisting} \\
+\hline
+
+\end{tabular}
+\end{table}
+
 
 Die Test werden im gleichen Repository wie die Anwendung selbst gehalten. Es wird ein separater Ordner für die Tests erstellt. In der CI/CD-Pipeline wird ein dedizierter Job integriert, der die Tests bei jedem Build ausführt. So können fehlerhafte Implementierungen frühzeitig erkannt und rückgemeldet werden.
 
