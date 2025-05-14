@@ -10,7 +10,7 @@ Benutzer, die sich über die EcoHub-Plattform bei Pax anmelden möchten, müssen
 
 Dieser Prozess erfolgt manuell, ist fehleranfällig und verursacht hohen administrativen Aufwand.
 
-Sollte sich ein Broker anmelden wollen, der nicht im LDAP vorhanden ist, scheitert der Vorgang, da aktuell keine automatische Benutzererstellung existiert. Die vorhandene \textit{addUser}-Funktion generiert eine IDP-Nummer, welche für die Durchführung des Single Sign-On (SSO) zwingend erforderlich ist. Die Web Access Management (WAM) prüft im Rahmen des SSO auf das Vorhandensein dieser IDP-Nummer. Fehlt sie, wird der Zugriff verweigert.
+Sollte sich ein Broker anmelden wollen, der nicht im LDAP vorhanden ist, scheitert der Vorgang, da aktuell keine automatische Benutzererstellung existiert. Die vorhandene \texttt{addUser}-Funktion generiert eine IDP-Nummer, welche für die Durchführung des Single Sign-On (SSO) zwingend erforderlich ist. Die Web Access Management (WAM) prüft im Rahmen des SSO auf das Vorhandensein dieser IDP-Nummer. Fehlt sie, wird der Zugriff verweigert.
 
 Auf der EcoHub-Plattform existieren bereits eigene Berechtigungskonzepte. Diese stimmen grösstenteils mit jenen der Pax überein. Es wird zwischen Einzelleben (EL) und Kollektivleben (KL) unterschieden (siehe Abbildung \ref{fig:rollenEcoHub}). Obwohl diese Rollen über EcoHub zugewiesen werden können, werden sie derzeit nicht automatisch in das LDAP-Verzeichnis übernommen und operativ nicht weiterverwendet
 
@@ -63,7 +63,7 @@ Vor der Integration dieser Struktur in das GitHub-Repository wurde geprüft, ob 
 
 
 \subsection{Business Process Model der updateUser-Funktion (BPM)}
-Eine \textit{updateUser}-Funktion ist vorhanden, erfüllt jedoch noch nicht die gewünschten Anforderungen hinsichtlich automatischer Rechtezuweisung oder Synchronisierung. Wie in der Abbildung \ref{fig:bpm-ist} zu sehen ist, wird bei der updateUser-Funktion die gleiche Logik wie bei der addUser-Funktion verwendet.
+Eine \textit{updateUser}-Funktion ist vorhanden, erfüllt jedoch noch nicht die gewünschten Anforderungen hinsichtlich automatischer Rechtezuweisung oder Synchronisierung. Wie in der Abbildung \ref{fig:bpm-ist} zu sehen ist, wird bei der updateUser-Funktion die gleiche Logik wie bei der \texttt{addUser}-Funktion verwendet.
 
 \vspace{1em}
 \begin{figure}[H]
@@ -88,7 +88,7 @@ Die folgende Tabelle gibt einen Überblick über die zu testenden Endpunkte und 
   \endhead
   \hline
   \endfoot
-  addUser & Sucht einen Broker im LDAP-Verzeichnis anhand der E-Mail-Adresse und weist diesem eine IDP-Nummer zu. \\
+  \texttt{addUser} & Sucht einen Broker im LDAP-Verzeichnis anhand der E-Mail-Adresse und weist diesem eine IDP-Nummer zu. \\
   \hline
   updateUser & Aktualisiert die IDP-Nummer im LDAP-Verzeichnis. \\
   \hline
@@ -97,6 +97,167 @@ Die folgende Tabelle gibt einen Überblick über die zu testenden Endpunkte und 
   getUserStatus & Prüft die Existenz der IDP-Nummer eines Benutzers im LDAP-Verzeichnis. \\
   \hline
 \end{longtable}
+
+
+\subsection{Struktur der SOAP-Nachrichten}
+
+Die Benutzerprovisionierung erfolgt über eine SOAP-Schnittstelle, bei der unterschiedliche Endpunkte wie \texttt{addUser}, \texttt{updateUser}, \texttt{deleteUser} und \texttt{getUserStatus} verwendet werden. Die meisten Endpunkte besitzen eine eigene XML-Struktur, welche den jeweiligen Verwendungszweck widerspiegelt. Die Struktur ist vorgegeben, wurde aber im Rahmen der Analyse hinsichtlich Relevanz und Vollständigkeit geprüft.
+
+\subsubsection*{Endpunkt: \texttt{addUser}}
+
+Die folgende Nachricht zeigt eine typische \texttt{addUser}-Anfrage. Die wichtigsten übermittelten Informationen betreffen die Benutzeridentifikation (\texttt{idpUserId}), Rollenzuweisung (\texttt{igRoles}) sowie persönliche Angaben.
+
+\begin{lstlisting}[language=XML, caption={Beispielhafte addUser-Anfrage}]
+    <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+    <soapenv:Header/>
+    <soapenv:Body>
+       <user:addUserType xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+            <idpUserId>123</idpUserId>
+            <orgId>1</orgId>
+            <igRoles>EL_OFFERT</igRoles>
+            <orgRegNo>10</orgRegNo>
+            <primaryOU>
+                <id>1</id>
+                <regNo>10</regNo>
+                <type>test</type>
+                <name>test</name>
+            </primaryOU>
+            <employed>true</employed>
+            <givenName>max</givenName>
+            <surname>mustermann</surname>
+            <userEmail>max.mustermann1@email.ch</userEmail>
+            <userOfficePhone>123</userOfficePhone>
+            <userMobilePhone>123</userMobilePhone>
+            <userBirthday>1970-01-01T00:00:00Z</userBirthday>
+            <userSex>M</userSex>
+            <userLanguage>DE</userLanguage>
+            <validFrom>2024-01-01T00:00:00Z</validFrom>
+            <validTo>2024-12-31T00:00:00Z</validTo>
+            <userType>PERSONAL</userType>
+            <userCategory>BROKER</userCategory>
+            <creationDate>2024-01-01T00:00:00Z</creationDate>
+            <creationUser>admin</creationUser>
+            <modificationDate>2024-01-01T00:00:00Z</modificationDate>
+            <modificationUser>admin</modificationUser>
+            <requestId>1</requestId>
+            <requestTime>2024-01-01T00:00:10Z</requestTime>
+        </user:addUserType>
+    </soapenv:Body>
+    </soapenv:Envelope>
+\end{lstlisting}
+
+\subsubsection*{Endpunkt: \texttt{updateUser}}
+
+Bei der \texttt{updateUser}-Anfrage wird die gleiche XML-Struktur verwendet wie bei der \texttt{addUser}-Anfrage.
+
+\subsubsection*{Endpunkt: \texttt{deleteUser}}
+
+Die folgende Nachricht zeigt eine typische \texttt{deleteUser}-Anfrage. Die wichtigsten übermittelten Informationen betreffen die Benutzeridentifikation (\texttt{idpUserId}).
+
+\begin{lstlisting}[language=XML, caption={Beispielhafte addUser-Anfrage}]
+    <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+    <soapenv:Header/>
+    <soapenv:Body>
+        <user:deleteUserType xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+            <idpUserId>222</idpUserId>
+            <deletionDate>2024-12-01T00:00:00Z</deletionDate>
+            <deletionUser>admin</deletionUser>
+            <requestId>1</requestId>
+            <requestTime>2024-12-01T00:00:10Z</requestTime>
+        </user:deleteUserType>
+    </soapenv:Body>
+    </soapenv:Envelope>
+\end{lstlisting}
+
+\subsubsection*{Endpunkt: \texttt{getUserStatus}}
+
+Die folgende Nachricht zeigt eine typische \texttt{getUserStatus}-Anfrage. 
+
+\begin{lstlisting}[language=XML, caption={Fehlermeldung bei addUser-Anfrage}]
+    <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+      <SOAP-ENV:Header/>
+      <SOAP-ENV:Body>
+        <ns3:commonReturnType xmlns:ns3="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+          <returnCode>ERROR</returnCode>
+          <errorMessage>Processing add user failed for idpUserId=123</errorMessage>
+        </ns3:commonReturnType>
+      </SOAP-ENV:Body>
+    </SOAP-ENV:Envelope>
+\end{lstlisting}
+
+\subsubsection*{Antwortstruktur bei Fehlern}
+
+Im Erfolgsfall erfolgt keine Rückmeldung. Tritt jedoch ein Fehler auf, wird eine Antwort mit einem Fehlercode und einer Nachricht geliefert, folgend ein Beispiel:
+
+\begin{lstlisting}[language=XML, caption={Fehlermeldung bei addUser-Anfrage}]
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+  <SOAP-ENV:Header/>
+  <SOAP-ENV:Body>
+    <ns3:commonReturnType xmlns:ns3="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+      <returnCode>ERROR</returnCode>
+      <errorMessage>Processing add user failed for idpUserId=123</errorMessage>
+    </ns3:commonReturnType>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+\end{lstlisting}
+
+\subsubsection*{Feldrelevanz}
+
+Folgende Felder sind für die weitere Verarbeitung im Provisioning-Service besonders relevant:
+
+\begin{itemize}
+  \item \textbf{idpUserId:} Eindeutige Identifikation des Benutzers im LDAP
+  \item \textbf{igRoles:} Grundlage für rollenbasierte Gruppenzuweisung
+  \item \textbf{userEmail:} Wird als Mail-Attribut in LDAP übernommen
+  \item \textbf{requestTime:} Technisches Feld zur Nachvollziehbarkeit
+\end{itemize}
+
+Die XML-Struktur bildet somit das zentrale Bindeglied zwischen dem externen Aufrufer und der internen LDAP-Provisionierung.
+
+\subsection{Analyse der bestehenden CI/CD-Pipeline}
+
+Zur Qualitätssicherung und Automatisierung der Build- und Testprozesse wird im Projekt eine GitHub-Actions-basierte CI/CD-Pipeline eingesetzt. Diese ist in der Datei \texttt{pipeline.yml} definiert und wird bei jedem \texttt{push} ins Repository ausgeführt.
+
+\subsubsection*{Übersicht der Jobs}
+
+Die Pipeline besteht aus vier zentralen Jobs:
+
+\begin{itemize}
+  \item \textbf{test:} Führt automatisierte Unit-Tests mit Maven aus
+  \item \textbf{build:} Erstellt das Projekt und bereitet ein Docker-Image vor
+  \item \textbf{publish:} Veröffentlicht das Docker-Image in eine Container Registry (nur bei Tags)
+  \item \textbf{delete\_artifacts:} Entfernt erstellte Artefakte nach erfolgreicher Veröffentlichung
+\end{itemize}
+
+\subsubsection*{Technische Details (Auszug Job \texttt{test})}
+
+\begin{lstlisting}[language=yaml, caption={Auszug aus pipeline.yml}]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      - name: Execute tests
+        run: chmod +x ./mvnw && ./mvnw test
+\end{lstlisting}
+
+Die Tests werden vor dem Build ausgeführt und dienen als Quality-Gate. Nur bei erfolgreichem Testdurchlauf wird das Projekt gebaut und ein Docker-Image erzeugt.
+
+\subsubsection*{Integration in den Entwicklungsprozess}
+
+Diese Pipeline bildet die Grundlage für die kontinuierliche Validierung und Bereitstellung des Provisioning-Dienstes. Dadurch wird sichergestellt, dass:
+
+\begin{itemize}
+  \item Änderungen stets mit bestehenden Funktionalitäten kompatibel sind
+  \item Fehler frühzeitig erkannt werden
+  \item Releases nur bei validierten Git-Tags veröffentlicht werden
+\end{itemize}
+
 
 \subsection{Darstellung der Systemstruktur im IST-Stand}
 Folgend wird die Systemstruktur im IST-Stand dargestellt. Diese wird während dieser Arbeit jedoch nicht verändert und dient nur zur Veranschaulichung des aktuellen Zustands.
@@ -206,7 +367,7 @@ Schwachstellen sind konkrete Mängel oder Probleme im aktuellen System oder Proz
 Risiken sind mögliche Probleme oder Gefahren, die beim Projektverlauf oder der Umsetzung der Änderung auftreten könnten - also zukünftige Unsicherheiten. Folgende wurden für dieses Projekt erkannt.
 
 \begin{itemize}
-    \item Fehlerhafte Zuordnung von Rollen. Die Mappingfunktion weist den Broker in falsche Gruppen und Rollen.
+    \item Fehlerhafte Zuordnung von Rollen. Die Mapping-Funktion weist den Broker in falsche Gruppen und Rollen.
     \item Änderung an LDAP-Struktur. Ungründliche Vorbereitung und Arbeiten könnte die LDAP-Struktur verändern.
     \item Unvollständige Testabdeckung. Werden die Funktionen oder Endpunkte nicht vollständig abgedeckt, kann es weiterhin zu unentdeckten Problemen führen.
 \end{itemize}
@@ -225,7 +386,7 @@ Wichtig ist, sich nicht in der eigenen Arbeit zu verlieren oder sich in andere A
 Auch dass die Gruppen-Zuteilung bei der initialen Anmeldung geschieht, ist nicht Teil der IPA.
 
 \section{Erweiterte Aufgabenstellung}
-Die Aufgabe in dieser IPA bezieht sich auf zwei der Ziele. Es soll eine Mappingfunktion geschrieben werden welche die EcoHub Rollen mit den internen Rollen verbindet. Das soll geschehen sollten sich die Rollen des Broker ändern und ein update nötig sein.
+Die Aufgabe in dieser IPA bezieht sich auf zwei der Ziele. Es soll eine Mapping-Funktion geschrieben werden welche die EcoHub Rollen mit den internen Rollen verbindet. Das soll geschehen sollten sich die Rollen des Broker ändern und ein update nötig sein.
 Auch sollen alle Schnittstellen des EcoHub-Services automatisiert getestet werden, die Automation soll über eine Pipeline laufen.
 
 

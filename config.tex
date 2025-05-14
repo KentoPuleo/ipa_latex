@@ -65,8 +65,18 @@
 \usepackage{lastpage}
 \usepackage{lipsum}
 \usepackage{listings}
+\usepackage{xcolor}
 \usepackage{tcolorbox}
 \tcbuselibrary{listingsutf8}
+\lstset{
+  language=XML,
+  basicstyle=\ttfamily\footnotesize,
+  showstringspaces=false, 
+  breaklines=true,
+  columns=fullflexible,
+  frame=single,
+  backgroundcolor=\color{white}
+}
 \usepackage{multicol}
 \usepackage{multirow}
 \usepackage{parskip}
@@ -96,6 +106,7 @@
 
 \definecolor{lightgray}{RGB}{224,224,224}
 \definecolor{darkgray}{RGB}{192,192,192}
+\definecolor{xmllightgray}{gray}{0.95}
 
 % German names for lists
 \renewcommand{\listfigurename}{Abbildungsverzeichnis}
@@ -222,3 +233,33 @@
 
 % Rename table of contents
 \renewcommand{\contentsname}{Inhaltsverzeichnis}
+
+%%%%%%%%%%%%%%
+% Languages
+%%%%%%%%%%%%%%
+
+\lstdefinelanguage{XML}{
+  morestring=[b]",
+  morecomment=[s]{<!--}{-->},
+  morekeywords={xmlns,version,type,id},
+  keywordstyle=\color{blue},
+  commentstyle=\color{gray},
+  stringstyle=\color{red},
+  identifierstyle=\color{black},
+  sensitive=false
+}
+
+\lstdefinelanguage{yaml}{
+  keywords={true,false,null,y,n},
+  keywordstyle=\color{blue}\bfseries,
+  sensitive=false,
+  comment=[l]{\#},
+  morecomment=[l]{\#},
+  commentstyle=\color{gray}\ttfamily,
+  morestring=[b]',
+  morestring=[b]",
+  stringstyle=\color{orange},
+  identifierstyle=\color{black},
+  basicstyle=\ttfamily\small,
+  showstringspaces=false
+}

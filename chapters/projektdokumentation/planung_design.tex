@@ -64,7 +64,7 @@ Die farbliche Markierung der Gruppen in Abbildung \ref{fig:ldapgruppen} veransch
 
 Nachfolgend ein exemplarischer Auszug aus der Konfiguration:
 
-\begin{lstlisting}[caption={Auszug aus der YAML-Konfiguration für rollenbasiertes Mapping}, label={lst:role-mapping}]
+\begin{lstlisting}[language=yaml, caption={Auszug aus der YAML-Konfiguration für rollenbasiertes Mapping}, label={lst:role-mapping}]
 ecohub:
   ldap:
     groupSearchBase: ou=groups,dc=paxportal,dc=ch
@@ -94,91 +94,176 @@ Zur Sicherstellung der Funktionalität und zur frühzeitigen Fehlererkennung wer
     \item Integration in die bestehende GitHub-Actions-Pipeline
 \end{itemize}
 
-\subsection*{Testfälle (Auswahl)}
-\begin{table}[H]
-\centering
-\caption{Testfälle für den Endpoint \texttt{updateUser} mit Input und erwarteter Ausgabe}
-\label{tab:testcases-updateUser}
-\begin{tabular}{|p{1.2cm}|p{3cm}|p{4cm}|p{6.5cm}|}
-\hline
-\textbf{ID} & \textbf{Titel} & \textbf{Beschreibung} & \textbf{Details} \\
-\hline
-
-\multirow{2}{*}{TC01} & \multirow{2}{*}{EL\_ Benutzer} & \multirow{2}{*}{Benutzer mit EL\_ Rolle soll mehreren Gruppen zugewiesen werden} & 
-\textbf{SOAP Request (Input):} 
-\begin{lstlisting}[language=XML]
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
-  <soapenv:Body>
-    <user:updateUserType>
-      <idpUserId>el123</idpUserId>
-      <userEmail>el.user@pax.ch</userEmail>
-      <igRoles>EL_BROKER</igRoles>
-    </user:updateUserType>
-  </soapenv:Body>
-</soapenv:Envelope>
-\end{lstlisting} \\
-\cline{4-4}
-& & & 
-\textbf{Expected Output (z.B. Gruppenmitgliedschaften):}
-\begin{lstlisting}[language=XML]
-<soapenv:Envelope ...>
-  <soapenv:Body>
-    <user:updateUserResponse>
-      <status>SUCCESS</status>
-      <groups>
-        <group>EXTERNPAX_A_BROKERPORTAL</group>
-        <group>EXTERNPAX_A_QUICKSALE</group>
-        <group>EXTERNPAX_A_LOGISMATA_B2B</group>
-        <group>EXTERNPAX_A_BROKERDASHBOARD</group>
-      </groups>
-    </user:updateUserResponse>
-  </soapenv:Body>
-</soapenv:Envelope>
-\end{lstlisting} \\
-\hline
-
-\multirow{2}{*}{TC02} & \multirow{2}{*}{KL\_ Benutzer} & \multirow{2}{*}{Benutzer mit KL\_ Rolle soll nur VERTRAGSSERVICE zugewiesen bekommen} & 
-\textbf{SOAP Request (Input):}
-\begin{lstlisting}[language=XML]
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
-  <soapenv:Body>
-    <user:updateUserType>
-      <idpUserId>kl456</idpUserId>
-      <userEmail>kl.user@pax.ch</userEmail>
-      <igRoles>KL_SERVICE</igRoles>
-    </user:updateUserType>
-  </soapenv:Body>
-</soapenv:Envelope>
-\end{lstlisting} \\
-\cline{4-4}
-& & &
-\textbf{Expected Output:}
-\begin{lstlisting}[language=XML]
-<soapenv:Envelope ...>
-  <soapenv:Body>
-    <user:updateUserResponse>
-      <status>SUCCESS</status>
-      <groups>
-        <group>EXTERNPAX_A_VERTRAGSSERVICE</group>
-      </groups>
-    </user:updateUserResponse>
-  </soapenv:Body>
-</soapenv:Envelope>
-\end{lstlisting} \\
-\hline
-
-\end{tabular}
-\end{table}
-
+\section{Testfälle}
 
 Die Test werden im gleichen Repository wie die Anwendung selbst gehalten. Es wird ein separater Ordner für die Tests erstellt. In der CI/CD-Pipeline wird ein dedizierter Job integriert, der die Tests bei jedem Build ausführt. So können fehlerhafte Implementierungen frühzeitig erkannt und rückgemeldet werden.
 
-\section{ Versionierung}
+\input{chapters/projektdokumentation/testcases}
+
+\subsection{Erweiterung der CI/CD-Pipeline mit Docker und Playwright}
+
+
+Zur Sicherstellung der korrekten Zusammenarbeit zwischen der Applikation und dem LDAP-System ist geplant, einen zusätzlichen CI/CD-Job für automatisierte End-to-End-Tests (E2E) zu implementieren. Dieser basiert auf dem bestehenden \texttt{docker-compose.yml} und nutzt Playwright zur Ausführung der Tests.
+
+\textbf{Hinweis:} Es handelt sich hierbei um eine konzeptionelle Designüberlegung. Die finale technische Umsetzung kann im Verlauf der Implementierungsphase angepasst oder erweitert werden.
+
+\subsubsection*{Geplante Testumgebung}
+
+Mittels Docker Compose soll eine isolierte Testumgebung aufgesetzt werden, die folgende Komponenten umfasst:
+
+\begin{itemize}
+  \item Die Spring-Boot-Applikation (\texttt{pax-ecohub-provisioning})
+  \item Einen OpenLDAP-Container mit vordefiniertem Schema und Testdaten
+\end{itemize}
+
+\subsubsection*{Ablauf des neuen Jobs \texttt{api-tests}}
+
+\begin{enumerate}
+  \item Start der Testumgebung mit \texttt{docker-compose up -d}
+  \item Warten auf Initialisierung der Dienste
+  \item Ausführen der Playwright-Tests gegen die laufende Umgebung
+  \item Aufräumen der Umgebung mittels \texttt{docker-compose down}
+\end{enumerate}
+
+\subsubsection*{Geplanter CI/CD-Ausschnitt}
+
+\begin{lstlisting}[language=yaml, caption={Entwurf: CI/CD-Job für E2E-Tests}]
+jobs:
+  api-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Compose environment
+        run: docker-compose up -d
+
+      - name: Wait for services to initialize
+        run: sleep 20
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies and run Playwright tests
+        run: |
+          npm ci
+          npx playwright test
+
+      - name: Tear down environment
+        if: always()
+        run: docker-compose down
+\end{lstlisting}
+
+\subsubsection*{Ziele dieser Erweiterung}
+
+\begin{itemize}
+  \item Vollständige Integrationstests der Anwendung in Kombination mit LDAP
+  \item Sicherstellung der API-Funktionalität unter realen Bedingungen
+  \item Wiederverwendung der vorhandenen Container-Infrastruktur aus der Entwicklung
+\end{itemize}
+
+\section{Technische Arbeitspakete}
+In folgendem Abschnitt werden die technischen Arbeitspakete aufgelistet, die im Rahmen dieses Projekts umgesetzt werden. Es handelt sich hierbei um veränderungen an dem bestehenden Code, keine dokumentationen oder organisationellen Änderungen.
+
+Da die Mapping-Funktion änderungen an der bestehenden Struktur erfordert, wird diese zuerst umgesetzt.
+
+\begin{longtable}{|l|p{0.4\textwidth}|p{0.4\textwidth}|l|}
+  \caption{Technische Arbeitspakete} \label{tab:tech-arbeitspakete} \\
+  \hline
+  \textbf{ID} & \textbf{Titel} & \textbf{Beschreibung} & \textbf{Dauer} \\
+  \hline
+  \endfirsthead
+  \multicolumn{4}{c}{Fortsetzung von Tabelle \ref{tab:aufgaben}} \\
+  \hline
+  \textbf{ID} & \textbf{Titel} & \textbf{Beschreibung} & \textbf{Dauer} \\
+  \hline
+  \endhead
+  \hline
+  \endfoot
+  1 & Konfigurationsfile erstellen & Es wird ein Konfigurationsfile erstellt, welches die Mapping-Funktion definiert. & 1h \\
+  \hline
+  2 & Enterferne Nutzer aus bekannten Gruppen & Es wird eine Funktion implementiert, welche die Nutzer aus den bekannten Gruppen entfernt. & 1h \\
+  \hline
+  3 & Nutzer den neuen Gruppen zuordnen & Es wird eine Funktion implementiert, welche die Nutzer den neuen Gruppen zuordnet. & 2h \\
+  \hline
+  4 & Testen der updateUser-Funktion & Die Funktion wird getestet, ob sie die Mapping-Funktion korrekt umsetzt. & 2h \\
+  \hline
+  5 & API-Tests für Endpunkt \texttt{addUser} erstellen & Es wird eine Playwright-Testsuite erstellt, welche die API-Funktionalität des Endpunktes \texttt{addUser} testet. & 1h \\
+  \hline
+  6 & API-Tests für Endpunkt \texttt{updateUser} erstellen & Es wird eine Playwright-Testsuite erstellt, welche die API-Funktionalität des Endpunktes \texttt{updateUser} testet. & 1h \\
+  \hline
+  7 & API-Tests für Endpunkt \texttt{deleteUser} erstellen & Es wird eine Playwright-Testsuite erstellt, welche die API-Funktionalität des Endpunktes \texttt{deleteUser} testet. & 1h \\
+  \hline
+  8 & API-Tests für Endpunkt \texttt{getUserStatus} erstellen & Es wird eine Playwright-Testsuite erstellt, welche die API-Funktionalität des Endpunktes \texttt{getUserStatus} testet. & 1h \\
+  \hline
+  9 & Integration der Tests in die CI/CD-Pipeline & Es wird die Testsuite in die CI/CD-Pipeline integriert und die Tests werden ausgeführt. & 2h \\
+  \hline
+\end{longtable} 
+
+\section{Tools und Technologien}
+
+In diesem Abschnitt werden die im Projekt eingesetzten Tools und Technologien beschrieben. Sie dienen der Unterstützung bei Entwicklung, Test und Qualitätssicherung der erweiterten SOAP-Schnittstellen sowie der LDAP-Anbindung.
+
+\subsection{Testen der Mapping-Funktion mit SoapUI und OpenLDAP}
+
+Die im Rahmen der \texttt{updateUser}-Funktion implementierte rollenbasierte Mapping-Funktion kann nicht vollständig durch automatisierte API-Tests abgedeckt werden. Um diese dennoch zuverlässig zu testen, wird ein manueller Testansatz verfolgt.
+
+Hierzu wird die Anwendung lokal gestartet und mit Hilfe von \textbf{SoapUI} gezielt über den \texttt{updateUser}-SOAP-Endpunkt angesprochen. Gleichzeitig wird ein \textbf{OpenLDAP}-Container lokal ausgeführt, welcher als Testverzeichnisdienst dient. So kann überprüft werden, ob Benutzer – basierend auf übermittelten Rollen – korrekt den entsprechenden Gruppen im LDAP hinzugefügt werden.
+
+SoapUI ermöglicht das flexible Erstellen und Anpassen von SOAP-Anfragen, wodurch verschiedene Rollenkonstellationen getestet werden können. Durch anschliessende Kontrolle der Einträge im LDAP (z.\,B. mit \texttt{ldapsearch}) lässt sich die Funktionsweise der Mapping-Logik gezielt überprüfen.
+
+\subsection{Automatisierte API-Tests mit Playwright}
+
+Zur Sicherstellung der allgemeinen Funktionsfähigkeit der implementierten SOAP-Endpunkte wird das Framework \textbf{Playwright} eingesetzt. Obwohl Playwright ursprünglich für browserbasierte End-to-End-Tests konzipiert wurde, lässt es sich auch hervorragend für HTTP-basierte API-Tests verwenden. 
+
+In diesem Projekt wird Playwright verwendet, um die vier zentralen Funktionen der SOAP-Schnittstelle automatisiert zu testen: \texttt{addUser}, \texttt{updateUser}, \texttt{deleteUser} und \texttt{getUserStatus}. Ziel ist es, die korrekte Verarbeitung valider Anfragen zu prüfen sowie typische Fehlerfälle (z.\,B. fehlende Felder oder ungültige Inhalte) automatisiert zu erkennen. Die Tests werden in TypeScript implementiert und als Teil der CI/CD-Pipeline über GitHub Actions ausgeführt.
+
+\textbf{Erfahrung im Unternehmen:} Bei der \textbf{PAX} wird Playwright bereits erfolgreich in anderen Entwicklungsprojekten eingesetzt, insbesondere zur automatisierten Prüfung von Webanwendungen. Die vorhandene Erfahrung im Team sowie bestehende Best Practices sprachen für den Einsatz dieses Tools auch im Rahmen dieses Projekts.
+
+\textbf{Vergleich mit Alternativen:} Vor der Entscheidung für Playwright wurden auch andere Tools in Betracht gezogen, wie etwa:
+\begin{itemize}
+  \item \textbf{Postman/Newman:} Gute Unterstützung für einfache REST-Tests, aber eingeschränkte SOAP-Funktionalität und weniger flexible Automatisierung.
+  \item \textbf{REST Assured (Java):} Sehr leistungsfähig für HTTP-Tests, allerdings eng an die Java-Welt gebunden und weniger etabliert im Team.
+  \item \textbf{SoapUI:} Gut geeignet für manuelle Tests, aber weniger flexibel für API-Testautomatisierung in CI/CD.
+\end{itemize}
+
+Die Entscheidung fiel letztlich zugunsten von Playwright, da es bereits im Unternehmen etabliert ist, moderne Entwicklungs-Workflows unterstützt und sich gut in bestehende Pipelines integrieren lässt.
+
+
+\subsection{Versionierung}
 Eine sicheres Versionierungsverwaltung ist besonders wichtig, sollten Daten verloren gehen, kann diese Sicherung die Daten wiederherstellen.
 
-In dieser Arbeit wird für die Versionierung Git mit der Online-Plattform Github verwendet.
+In dieser Arbeit wird für die Versionierung Git mit der Online-Plattform Github verwendet, da die Pax bereits Github als VCS verwendet.
 
 Git ist ein verteiltes Versionskontrollsystem, mit dem Entwickler den Verlauf von Änderungen an Dateien \- insbesondere Quellcode \- nachverfolgen können. Es ermöglicht mehrere parallele Entwicklungszweige, erleichtert das Zusammenführen von Änderungen und unterstützt das Arbeiten im Team ohne Datenverlust.
 
 GitHub ist  die dazu passende Online-Plattform, die Git-Repositories hostet. Sie bietet zusätzliche Funktionen wie Benutzeroberfläche, Pull Requests, Issue-Tracking und CI/CD-Integration. GitHub erleichtert die Zusammenarbeit an Softwareprojekten und macht den Code öffentlich oder privat zugänglich.
 
+\section{Clean Code Prinzipien und Namenskonzept}
+
+Im Rahmen der Implementierung wurde besonderer Wert auf die Einhaltung von \textbf{Clean Code Prinzipien} gelegt. Ziel war es, die Lesbarkeit, Verständlichkeit und Wartbarkeit des Codes sicherzustellen. Die Umsetzung orientierte sich an bewährten Best Practices nach Robert C. Martin („Uncle Bob“) sowie an internen Entwicklungsrichtlinien der PAX.
+
+Die wichtigsten Massnahmen zur Verbesserung der Codequalität umfassten:
+
+\begin{itemize}
+  \item \textbf{Sprechende Bezeichner:} Methoden, Variablen und Klassen wurden mit aussagekräftigen Namen versehen, um deren Funktion klar zu kommunizieren (z.\,B. \texttt{mapRolesToGroups()} statt \texttt{handle()}).
+  
+  \item \textbf{Namenskonzept und Konventionen:} Es wurde ein einheitliches Namenskonzept verwendet:
+  \begin{itemize}
+    \item \texttt{camelCase} für Variablen- und Methodennamen (z.\,B. \texttt{userId}, \texttt{updateUserEntry()}),
+    \item \texttt{PascalCase} für Klassennamen (z.\,B. \texttt{PersonRepositoryImpl}),
+    \item \texttt{UPPER\_SNAKE\_CASE} für Konstanten (z.\,B. \texttt{LDAP\_BASE\_DN}).
+  \end{itemize}
+  Diese Konventionen fördern die visuelle Trennung und helfen dabei, unterschiedliche Code-Elemente auf einen Blick zu erkennen.
+
+  \item \textbf{Single Responsibility Principle:} Methoden und Klassen wurden so gestaltet, dass sie jeweils nur eine klar definierte Aufgabe übernehmen. Komplexe Logik wurde in kleinere, gut testbare Einheiten aufgeteilt.
+
+  \item \textbf{Vermeidung von magischen Werten:} Feste Werte wie Gruppen-DNs oder Rollenpräfixe wurden zentral in der \texttt{application.yml} oder in Konstanten abgelegt.
+
+  \item \textbf{Konsistente Formatierung:} Der Quellcode wurde gemäss dem PAX-internen Formatierungsstil (basierend auf dem Google Java Style Guide) strukturiert. Dies wurde durch entsprechende IDE-Tools automatisiert unterstützt.
+
+  \item \textbf{Zielgerichtete Fehlerbehandlung:} Fehlerfälle wurden gezielt behandelt und mit verständlichen Logmeldungen versehen, um eine einfache Diagnose und Debugging zu ermöglichen.
+\end{itemize}
+
+Die konsequente Anwendung dieser Prinzipien verbessert nicht nur die Wartbarkeit, sondern erleichtert auch den Wissenstransfer innerhalb des Teams. Neue Entwicklerinnen und Entwickler können sich so schneller im Code zurechtfinden.
