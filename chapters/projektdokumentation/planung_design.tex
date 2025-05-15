@@ -98,6 +98,51 @@ Zur Sicherstellung der Funktionalität und zur frühzeitigen Fehlererkennung wer
 
 Die Test werden im gleichen Repository wie die Anwendung selbst gehalten. Es wird ein separater Ordner für die Tests erstellt. In der CI/CD-Pipeline wird ein dedizierter Job integriert, der die Tests bei jedem Build ausführt. So können fehlerhafte Implementierungen frühzeitig erkannt und rückgemeldet werden.
 
+\subsection{Vollständige XML-Payloads zu \texttt{addUser, updateUser}}
+Die Testfälle zeigen nur die wichtigsten Daten der Anfragen. Folgend daher die einmal die vollständigen XML-Payloads für die zwei Endpunkte.
+
+\begin{lstlisting}[language=XML, caption={addUser-Anfrage mit fehlerhaften Daten Input}]
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <user:addUserType xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+        <idpUserId>-999</idpUserId>
+        <orgId>1</orgId>
+        <igRoles>EL_OFFERT</igRoles>
+        <orgRegNo>10</orgRegNo>
+        <primaryOU>
+          <id>1</id>
+          <regNo>10</regNo>
+          <type>test</type>
+          <name>test</name>
+        </primaryOU>
+        <employed>true</employed>
+        <givenName>Marco</givenName>
+        <surname>Frei</surname>
+        <userEmail>marco.frei@pax.ch</userEmail>
+        <userOfficePhone>123</userOfficePhone>
+        <userMobilePhone>123</userMobilePhone>
+        <userBirthday>1970-01-01T00:00:00Z</userBirthday>
+        <userSex>M</userSex>
+        <userLanguage>DE</userLanguage>
+        <validFrom>2024-01-01T00:00:00Z</validFrom>
+        <validTo>2024-12-31T00:00:00Z</validTo>
+        <userType>PERSONAL</userType>
+        <userCategory>BROKER</userCategory>
+        <creationDate>2024-01-01T00:00:00Z</creationDate>
+        <creationUser>admin</creationUser>
+        <modificationDate>2024-01-01T00:00:00Z</modificationDate>
+        <modificationUser>admin</modificationUser>
+        <requestId>1</requestId>
+        <requestTime>2024-01-01T00:00:10Z</requestTime>
+	    </user:addUserType>
+   </soapenv:Body>
+</soapenv:Envelope>
+\end{lstlisting}
+
+
+Nun die Testfälle zu den einzelnen Endpunkten:
+
 \input{chapters/projektdokumentation/testcases}
 
 \subsection{Erweiterung der CI/CD-Pipeline mit Docker und Playwright}

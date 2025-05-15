@@ -3,59 +3,35 @@
 \textbf{Test-ID: 1}
 
 \textbf{Beschreibung:} \\
-\texttt{addUser} wird fehlschlagen.
+\texttt{addUser} Nutzer erhält erfolgreich eine IDP-Nummer.
 
 \textbf{Input:}
 \begin{lstlisting}[language=XML, caption={addUser-Anfrage mit fehlerhaften Daten Input}]
-    <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
-    <soapenv:Header/>
-    <soapenv:Body>
-       <user:addUserType xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
-           <idpUserId>123</idpUserId>
-         <orgId>1</orgId>
-         <igRoles>EL_OFFERT</igRoles>
-         <orgRegNo>10</orgRegNo>
-         <primaryOU>
-            <id>1</id>
-            <regNo>10</regNo>
-            <type>test</type>
-            <name>test</name>
-         </primaryOU>
-         <employed>true</employed>
-         <givenName>max</givenName>
-         <surname>mustermann</surname>
-         <userEmail>max.mustermann1@email.ch</userEmail>
-         <userOfficePhone>123</userOfficePhone>
-         <userMobilePhone>123</userMobilePhone>
-         <userBirthday>1970-01-01T00:00:00Z</userBirthday>
-         <userSex>M</userSex>
-         <userLanguage>DE</userLanguage>
-         <validFrom>2024-01-01T00:00:00Z</validFrom>
-         <validTo>2024-12-31T00:00:00Z</validTo>
-         <userType>PERSONAL</userType>
-         <userCategory>BROKER</userCategory>
-         <creationDate>2024-01-01T00:00:00Z</creationDate>
-         <creationUser>admin</creationUser>
-         <modificationDate>2024-01-01T00:00:00Z</modificationDate>
-         <modificationUser>admin</modificationUser>
-         <requestId>1</requestId>
-         <requestTime>2024-01-01T00:00:10Z</requestTime>
-     </user:addUserType>
-    </soapenv:Body>
- </soapenv:Envelope>
+  <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+  <soapenv:Header/>
+  <soapenv:Body>
+      <user:addUserType xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+          <idpUserId>100</idpUserId>
+          ...
+          <givenName>Marco</givenName>
+          <surname>Frei</surname>
+          <userEmail>marco.frei@pax.ch</userEmail>
+          ...
+      </user:addUserType>
+  </soapenv:Body>
+</soapenv:Envelope>
 \end{lstlisting}
 
 \textbf{Erwartet:}
 \begin{lstlisting}[language=XML, caption={addUser-Anfrage mit fehlerhaften Daten Output}]
-    <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
-    <SOAP-ENV:Header/>
-    <SOAP-ENV:Body>
-       <ns3:commonReturnType xmlns:ns3="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
-          <returnCode>ERROR</returnCode>
-          <errorMessage>Processing add user failed for idpUserId=123</errorMessage>
-       </ns3:commonReturnType>
-    </SOAP-ENV:Body>
- </SOAP-ENV:Envelope>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+  <SOAP-ENV:Header/>
+  <SOAP-ENV:Body>
+     <ns3:commonReturnType xmlns:ns3="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+        <returnCode>OK</returnCode>
+     </ns3:commonReturnType>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
 \end{lstlisting}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -63,49 +39,36 @@
 \textbf{Test-ID: 2}
 
 \textbf{Beschreibung:} \\
-\texttt{addUser} wird fehlschlagen.
+\texttt{addUser} Nutzer hat bereits eine IDP-Nummer.
 
 \textbf{Input:}
 \begin{lstlisting}[language=XML, caption={addUser-Anfrage mit fehlerhaften Daten Input}]
-<user:addUserType xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
-  <idpUserId>123</idpUserId>
-  <orgId>1</orgId>
-  <igRoles>EL_OFFERT</igRoles>
-  <orgRegNo>10</orgRegNo>
-  <primaryOU>
-    <id>1</id>
-    <regNo>10</regNo>
-    <type>test</type>
-    <name>test</name>
-  </primaryOU>
-  <employed>true</employed>
-  <givenName>max</givenName>
-  <surname>mustermann</surname>
-  <userEmail>max.mustermann1@email.ch</userEmail>
-  <userOfficePhone>123</userOfficePhone>
-  <userMobilePhone>123</userMobilePhone>
-  <userBirthday>1970-01-01T00:00:00Z</userBirthday>
-  <userSex>M</userSex>
-  <userLanguage>DE</userLanguage>
-  <validFrom>2024-01-01T00:00:00Z</validFrom>
-  <validTo>2024-12-31T00:00:00Z</validTo>
-  <userType>PERSONAL</userType>
-  <userCategory>BROKER</userCategory>
-  <creationDate>2024-01-01T00:00:00Z</creationDate>
-  <creationUser>admin</creationUser>
-  <modificationDate>2024-01-01T00:00:00Z</modificationDate>
-  <modificationUser>admin</modificationUser>
-  <requestId>1</requestId>
-  <requestTime>2024-01-01T00:00:10Z</requestTime>
-</user:addUserType>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+  <soapenv:Header/>
+  <soapenv:Body>
+      <user:addUserType xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+          <idpUserId>101</idpUserId>
+          ...
+          <givenName>Max</givenName>
+          <surname>Mustermann</surname>
+          <userEmail>max.mustermann@pax.ch</userEmail>
+          ...
+      </user:addUserType>
+  </soapenv:Body>
+</soapenv:Envelope>
 \end{lstlisting}
 
 \textbf{Erwartet:}
 \begin{lstlisting}[language=XML, caption={addUser-Anfrage mit fehlerhaften Daten Output}]
-<ns3:commonReturnType xmlns:ns3="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
-  <returnCode>ERROR</returnCode>
-  <errorMessage>Processing add user failed for idpUserId=123</errorMessage>
-</ns3:commonReturnType>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+  <SOAP-ENV:Header/>
+  <SOAP-ENV:Body>
+     <ns3:commonReturnType xmlns:ns3="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+        <returnCode>USER_EXISTS</returnCode>
+        <errorMessage>User already exists with idpUserId=101</errorMessage>
+     </ns3:commonReturnType>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
 \end{lstlisting}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -113,49 +76,36 @@
 \textbf{Test-ID: 3}
 
 \textbf{Beschreibung:} \\
-\texttt{addUser} wird fehlschlagen.
+\texttt{addUser} Payload unvollständig.
 
 \textbf{Input:}
 \begin{lstlisting}[language=XML, caption={addUser-Anfrage mit fehlerhaften Daten Input}]   
-<user:addUserType xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
-  <idpUserId>123</idpUserId>
-  <orgId>1</orgId>
-  <igRoles>EL_OFFERT</igRoles>
-  <orgRegNo>10</orgRegNo>
-  <primaryOU>
-    <id>1</id>
-    <regNo>10</regNo>
-    <type>test</type>
-    <name>test</name>
-  </primaryOU>
-  <employed>true</employed>
-  <givenName>max</givenName>
-  <surname>mustermann</surname>
-  <userEmail>max.mustermann1@email.ch</userEmail>
-  <userOfficePhone>123</userOfficePhone>
-  <userMobilePhone>123</userMobilePhone>
-  <userBirthday>1970-01-01T00:00:00Z</userBirthday>
-  <userSex>M</userSex>
-  <userLanguage>DE</userLanguage>
-  <validFrom>2024-01-01T00:00:00Z</validFrom>
-  <validTo>2024-12-31T00:00:00Z</validTo>
-  <userType>PERSONAL</userType>
-  <userCategory>BROKER</userCategory>
-  <creationDate>2024-01-01T00:00:00Z</creationDate>
-  <creationUser>admin</creationUser>
-  <modificationDate>2024-01-01T00:00:00Z</modificationDate>
-  <modificationUser>admin</modificationUser>
-  <requestId>1</requestId>
-  <requestTime>2024-01-01T00:00:10Z</requestTime>
-</user:addUserType>
+  <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+  <soapenv:Header/>
+  <soapenv:Body>
+      <user:addUserType xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+          <idpUserId>103</idpUserId>
+          ...
+          <givenName>Marco</givenName>
+          
+          <userEmail>marco.frei@pax.ch</userEmail>
+          ...
+      </user:addUserType>
+  </soapenv:Body>
+</soapenv:Envelope>
 \end{lstlisting}
-
+  
 \textbf{Erwartet:}
 \begin{lstlisting}[language=XML, caption={addUser-Anfrage mit fehlerhaften Daten Output}]
-<ns3:commonReturnType xmlns:ns3="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
-  <returnCode>ERROR</returnCode>
-  <errorMessage>Processing add user failed for idpUserId=123</errorMessage>
-</ns3:commonReturnType>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+  <SOAP-ENV:Header/>
+  <SOAP-ENV:Body>
+     <ns3:commonReturnType xmlns:ns3="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+        <returnCode>ERROR</returnCode>
+        <errorMessage>Payload validation failed for idpUserId=111</errorMessage>
+     </ns3:commonReturnType>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
 \end{lstlisting}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -163,50 +113,38 @@
 \textbf{Test-ID: 4}
 
 \textbf{Beschreibung:} \\
-\texttt{addUser} wird fehlschlagen.
+\texttt{addUser} Email-Adresse kann nicht gefunden werden.
 
 \textbf{Input:}
 \begin{lstlisting}[language=XML, caption={addUser-Anfrage mit fehlerhaften Daten Input}]
-<user:addUserType xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
-  <idpUserId>123</idpUserId>
-  <orgId>1</orgId>
-  <igRoles>EL_OFFERT</igRoles>
-  <orgRegNo>10</orgRegNo>
-  <primaryOU>
-    <id>1</id>
-    <regNo>10</regNo>
-    <type>test</type>
-    <name>test</name>
-  </primaryOU>
-  <employed>true</employed>
-  <givenName>max</givenName>
-  <surname>mustermann</surname>
-  <userEmail>max.mustermann1@email.ch</userEmail>
-  <userOfficePhone>123</userOfficePhone>
-  <userMobilePhone>123</userMobilePhone>
-  <userBirthday>1970-01-01T00:00:00Z</userBirthday>
-  <userSex>M</userSex>
-  <userLanguage>DE</userLanguage>
-  <validFrom>2024-01-01T00:00:00Z</validFrom>
-  <validTo>2024-12-31T00:00:00Z</validTo>
-  <userType>PERSONAL</userType>
-  <userCategory>BROKER</userCategory>
-  <creationDate>2024-01-01T00:00:00Z</creationDate>
-  <creationUser>admin</creationUser>
-  <modificationDate>2024-01-01T00:00:00Z</modificationDate>
-  <modificationUser>admin</modificationUser>
-  <requestId>1</requestId>
-  <requestTime>2024-01-01T00:00:10Z</requestTime>
-</user:addUserType>
+  <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+  <soapenv:Header/>
+  <soapenv:Body>
+      <user:addUserType xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+          <idpUserId>104</idpUserId>
+          ...
+          <givenName>Marco</givenName>
+          <surname>Frei</surname>
+          <userEmail>marco.frei1@bug.ch</userEmail>
+          ...
+      </user:addUserType>
+  </soapenv:Body>
+</soapenv:Envelope>
 \end{lstlisting}
 
 \textbf{Erwartet:}
 \begin{lstlisting}[language=XML, caption={addUser-Anfrage mit fehlerhaften Daten Output}]
-<ns3:commonReturnType xmlns:ns3="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
-  <returnCode>ERROR</returnCode>
-  <errorMessage>Processing add user failed for idpUserId=123</errorMessage>
-</ns3:commonReturnType>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+  <SOAP-ENV:Header/>
+  <SOAP-ENV:Body>
+     <ns3:commonReturnType xmlns:ns3="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+        <returnCode>ERROR</returnCode>
+        <errorMessage>Processing add user failed for idpUserId=104</errorMessage>
+     </ns3:commonReturnType>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
 \end{lstlisting}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Neuer Endpunkt updateUser
@@ -217,49 +155,35 @@
 \textbf{Test-ID: 5}
 
 \textbf{Beschreibung:} \\
-\texttt{updateUser} wird fehlschlagen.
+\texttt{updateUser} Nutzer erhält erfolgreich eine neue IDP-Nummer.
 
 \textbf{Input:}
 \begin{lstlisting}[language=XML, caption={updateUser-Anfrage mit fehlerhaften Daten Input}]
-<user:addUserType xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
-  <idpUserId>123</idpUserId>
-  <orgId>1</orgId>
-  <igRoles>EL_OFFERT</igRoles>
-  <orgRegNo>10</orgRegNo>
-  <primaryOU>
-    <id>1</id>
-    <regNo>10</regNo>
-    <type>test</type>
-    <name>test</name>
-  </primaryOU>
-  <employed>true</employed>
-  <givenName>max</givenName>
-  <surname>mustermann</surname>
-  <userEmail>max.mustermann1@email.ch</userEmail>
-  <userOfficePhone>123</userOfficePhone>
-  <userMobilePhone>123</userMobilePhone>
-  <userBirthday>1970-01-01T00:00:00Z</userBirthday>
-  <userSex>M</userSex>
-  <userLanguage>DE</userLanguage>
-  <validFrom>2024-01-01T00:00:00Z</validFrom>
-  <validTo>2024-12-31T00:00:00Z</validTo>
-  <userType>PERSONAL</userType>
-  <userCategory>BROKER</userCategory>
-  <creationDate>2024-01-01T00:00:00Z</creationDate>
-  <creationUser>admin</creationUser>
-  <modificationDate>2024-01-01T00:00:00Z</modificationDate>
-  <modificationUser>admin</modificationUser>
-  <requestId>1</requestId>
-  <requestTime>2024-01-01T00:00:10Z</requestTime>
-</user:addUserType>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+  <soapenv:Header/>
+  <soapenv:Body>
+      <user:updateUserType xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+          <idpUserId>200</idpUserId>
+          ...
+          <givenName>Heidi</givenName>
+          <surname>Meier</surname>
+          <userEmail>heidi.meier@pax.ch</userEmail>
+          ...
+      </user:addUserType>
+  </soapenv:Body>
+</soapenv:Envelope>
 \end{lstlisting}
 
 \textbf{Erwartet:}
 \begin{lstlisting}[language=XML, caption={updateUser-Anfrage mit fehlerhaften Daten Output}]
-<ns3:commonReturnType xmlns:ns3="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
-  <returnCode>ERROR</returnCode>
-  <errorMessage>Processing add user failed for idpUserId=123</errorMessage>
-</ns3:commonReturnType>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+  <SOAP-ENV:Header/>
+  <SOAP-ENV:Body>
+     <ns3:commonReturnType xmlns:ns3="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+        <returnCode>OK</returnCode>
+     </ns3:commonReturnType>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
 \end{lstlisting}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -267,49 +191,36 @@
 \textbf{Test-ID: 6}
 
 \textbf{Beschreibung:} \\
-\texttt{addUser} wird fehlschlagen.
+\texttt{updateUser} Gesuchter Nutzer nicht gefunden.
 
 \textbf{Input:}
 \begin{lstlisting}[language=XML, caption={updateUser-Anfrage mit fehlerhaften Daten Input}]
-<user:addUserType xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
-  <idpUserId>123</idpUserId>
-  <orgId>1</orgId>
-  <igRoles>EL_OFFERT</igRoles>
-  <orgRegNo>10</orgRegNo>
-  <primaryOU>
-    <id>1</id>
-    <regNo>10</regNo>
-    <type>test</type>
-    <name>test</name>
-  </primaryOU>
-  <employed>true</employed>
-  <givenName>max</givenName>
-  <surname>mustermann</surname>
-  <userEmail>max.mustermann1@email.ch</userEmail>
-  <userOfficePhone>123</userOfficePhone>
-  <userMobilePhone>123</userMobilePhone>
-  <userBirthday>1970-01-01T00:00:00Z</userBirthday>
-  <userSex>M</userSex>
-  <userLanguage>DE</userLanguage>
-  <validFrom>2024-01-01T00:00:00Z</validFrom>
-  <validTo>2024-12-31T00:00:00Z</validTo>
-  <userType>PERSONAL</userType>
-  <userCategory>BROKER</userCategory>
-  <creationDate>2024-01-01T00:00:00Z</creationDate>
-  <creationUser>admin</creationUser>
-  <modificationDate>2024-01-01T00:00:00Z</modificationDate>
-  <modificationUser>admin</modificationUser>
-  <requestId>1</requestId>
-  <requestTime>2024-01-01T00:00:10Z</requestTime>
-</user:addUserType>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+  <soapenv:Header/>
+  <soapenv:Body>
+      <user:updateUserType xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+          <idpUserId>201</idpUserId>
+          ...
+          <givenName>Heidi</givenName>
+          <surname>Meier</surname>
+          <userEmail>heidi.meier1@bug.ch</userEmail>
+          ...
+      </user:addUserType>
+  </soapenv:Body>
+</soapenv:Envelope>
 \end{lstlisting}
 
 \textbf{Erwartet:}
 \begin{lstlisting}[language=XML, caption={updateUser-Anfrage mit fehlerhaften Daten Output}]
-<ns3:commonReturnType xmlns:ns3="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
-  <returnCode>ERROR</returnCode>
-  <errorMessage>Processing add user failed for idpUserId=123</errorMessage>
-</ns3:commonReturnType>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+  <SOAP-ENV:Header/>
+  <SOAP-ENV:Body>
+     <ns3:commonReturnType xmlns:ns3="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+        <returnCode>USER_NOT_FOUND</returnCode>
+        <errorMessage>User cannot update for idpUserId=201</errorMessage>
+     </ns3:commonReturnType>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
 \end{lstlisting}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -317,99 +228,36 @@
 \textbf{Test-ID: 7}
 
 \textbf{Beschreibung:} \\
-\texttt{addUser} wird fehlschlagen.
+\texttt{updateUser} Payload unvollständig.
 
 \textbf{Input:}
 \begin{lstlisting}[language=XML, caption={updateUser-Anfrage mit fehlerhaften Daten Input}]
-<user:addUserType xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
-  <idpUserId>123</idpUserId>
-  <orgId>1</orgId>
-  <igRoles>EL_OFFERT</igRoles>
-  <orgRegNo>10</orgRegNo>
-  <primaryOU>
-    <id>1</id>
-    <regNo>10</regNo>
-    <type>test</type>
-    <name>test</name>
-  </primaryOU>
-  <employed>true</employed>
-  <givenName>max</givenName>
-  <surname>mustermann</surname>
-  <userEmail>max.mustermann1@email.ch</userEmail>
-  <userOfficePhone>123</userOfficePhone>
-  <userMobilePhone>123</userMobilePhone>
-  <userBirthday>1970-01-01T00:00:00Z</userBirthday>
-  <userSex>M</userSex>
-  <userLanguage>DE</userLanguage>
-  <validFrom>2024-01-01T00:00:00Z</validFrom>
-  <validTo>2024-12-31T00:00:00Z</validTo>
-  <userType>PERSONAL</userType>
-  <userCategory>BROKER</userCategory>
-  <creationDate>2024-01-01T00:00:00Z</creationDate>
-  <creationUser>admin</creationUser>
-  <modificationDate>2024-01-01T00:00:00Z</modificationDate>
-  <modificationUser>admin</modificationUser>
-  <requestId>1</requestId>
-  <requestTime>2024-01-01T00:00:10Z</requestTime>
-</user:addUserType>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+  <soapenv:Header/>
+  <soapenv:Body>
+      <user:updateUserType xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+        <idpUserId>111</idpUserId>
+        ...
+        <givenName>Marco</givenName>
+        
+        <userEmail>marco.frei@pax.ch</userEmail>
+        ...
+      </user:addUserType>
+  </soapenv:Body>
+</soapenv:Envelope>
 \end{lstlisting}
 
 \textbf{Erwartet:}
 \begin{lstlisting}[language=XML, caption={updateUser-Anfrage mit fehlerhaften Daten Output}]
-<ns3:commonReturnType xmlns:ns3="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
-  <returnCode>ERROR</returnCode>
-  <errorMessage>Processing add user failed for idpUserId=123</errorMessage>
-</ns3:commonReturnType>
-\end{lstlisting}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\textbf{Test-ID: 8}
-
-\textbf{Beschreibung:} \\
-\texttt{addUser} wird fehlschlagen.
-
-\textbf{Input:}
-\begin{lstlisting}[language=XML, caption={updateUser-Anfrage mit fehlerhaften Daten Input}]
-<user:addUserType xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
-  <idpUserId>123</idpUserId>
-  <orgId>1</orgId>
-  <igRoles>EL_OFFERT</igRoles>
-  <orgRegNo>10</orgRegNo>
-  <primaryOU>
-    <id>1</id>
-    <regNo>10</regNo>
-    <type>test</type>
-    <name>test</name>
-  </primaryOU>
-  <employed>true</employed>
-  <givenName>max</givenName>
-  <surname>mustermann</surname>
-  <userEmail>max.mustermann1@email.ch</userEmail>
-  <userOfficePhone>123</userOfficePhone>
-  <userMobilePhone>123</userMobilePhone>
-  <userBirthday>1970-01-01T00:00:00Z</userBirthday>
-  <userSex>M</userSex>
-  <userLanguage>DE</userLanguage>
-  <validFrom>2024-01-01T00:00:00Z</validFrom>
-  <validTo>2024-12-31T00:00:00Z</validTo>
-  <userType>PERSONAL</userType>
-  <userCategory>BROKER</userCategory>
-  <creationDate>2024-01-01T00:00:00Z</creationDate>
-  <creationUser>admin</creationUser>
-  <modificationDate>2024-01-01T00:00:00Z</modificationDate>
-  <modificationUser>admin</modificationUser>
-  <requestId>1</requestId>
-  <requestTime>2024-01-01T00:00:10Z</requestTime>
-</user:addUserType>
-\end{lstlisting}
-
-\textbf{Erwartet:}
-\begin{lstlisting}[language=XML, caption={updateUser-Anfrage mit fehlerhaften Daten Output}]
-<ns3:commonReturnType xmlns:ns3="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
-  <returnCode>ERROR</returnCode>
-  <errorMessage>Processing add user failed for idpUserId=123</errorMessage>
-</ns3:commonReturnType>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+  <SOAP-ENV:Header/>
+  <SOAP-ENV:Body>
+     <ns3:commonReturnType xmlns:ns3="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+        <returnCode>ERROR</returnCode>
+        <errorMessage>Payload validation failed for idpUserId=111</errorMessage>
+     </ns3:commonReturnType>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
 \end{lstlisting}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -418,52 +266,73 @@
 \clearpage
 \subsection{Endpoint: \texttt{deleteUser}}
 
-\textbf{Test-ID: 9}
+\textbf{Test-ID: 8}
 
 \textbf{Beschreibung:} \\
-\texttt{addUser} wird fehlschlagen.
+\texttt{deleteUser} IDP-Nummer wird erfolgreich gelöscht.
 
 \textbf{Input:}
 \begin{lstlisting}[language=XML, caption={deleteUser-Anfrage mit fehlerhaften Daten Input}]
-<user:addUserType xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
-  <idpUserId>123</idpUserId>
-  <orgId>1</orgId>
-  <igRoles>EL_OFFERT</igRoles>
-  <orgRegNo>10</orgRegNo>
-  <primaryOU>
-    <id>1</id>
-    <regNo>10</regNo>
-    <type>test</type>
-    <name>test</name>
-  </primaryOU>
-  <employed>true</employed>
-  <givenName>max</givenName>
-  <surname>mustermann</surname>
-  <userEmail>max.mustermann1@email.ch</userEmail>
-  <userOfficePhone>123</userOfficePhone>
-  <userMobilePhone>123</userMobilePhone>
-  <userBirthday>1970-01-01T00:00:00Z</userBirthday>
-  <userSex>M</userSex>
-  <userLanguage>DE</userLanguage>
-  <validFrom>2024-01-01T00:00:00Z</validFrom>
-  <validTo>2024-12-31T00:00:00Z</validTo>
-  <userType>PERSONAL</userType>
-  <userCategory>BROKER</userCategory>
-  <creationDate>2024-01-01T00:00:00Z</creationDate>
-  <creationUser>admin</creationUser>
-  <modificationDate>2024-01-01T00:00:00Z</modificationDate>
-  <modificationUser>admin</modificationUser>
-  <requestId>1</requestId>
-  <requestTime>2024-01-01T00:00:10Z</requestTime>
-</user:addUserType>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+	<soapenv:Header/>
+	<soapenv:Body>
+		<user:deleteUserType xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+		<idpUserId>005</idpUserId>
+		<deletionDate>2024-12-01T00:00:00Z</deletionDate>
+		<deletionUser>admin</deletionUser>
+		<requestId>1</requestId>
+		<requestTime>2024-12-01T00:00:10Z</requestTime>
+		</user:deleteUserType>
+	</soapenv:Body>
+</soapenv:Envelope>
 \end{lstlisting}
 
 \textbf{Erwartet:}
 \begin{lstlisting}[language=XML, caption={deleteUser-Anfrage mit fehlerhaften Daten Output}]
-<ns3:commonReturnType xmlns:ns3="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
-  <returnCode>ERROR</returnCode>
-  <errorMessage>Processing add user failed for idpUserId=123</errorMessage>
-</ns3:commonReturnType>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+  <SOAP-ENV:Header/>
+  <SOAP-ENV:Body>
+     <ns3:commonReturnType xmlns:ns3="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+        <returnCode>OK</returnCode>
+     </ns3:commonReturnType>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+\end{lstlisting}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\textbf{Test-ID: 9}
+
+\textbf{Beschreibung:} \\
+\texttt{deleteUser} Payload unvollständig.
+
+\textbf{Input:}
+\begin{lstlisting}[language=XML, caption={deleteUser-Anfrage mit fehlerhaften Daten Input}]
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+	<soapenv:Header/>
+	<soapenv:Body>
+		<user:deleteUserType xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+		<idpUserId>11111111111111111111111</idpUserId>
+		<deletionDate>2024-12-01T00:00:00Z</deletionDate>
+		<deletionUser>admin</deletionUser>
+		<requestId>1</requestId>
+		<requestTime>2024-12-01T00:00:10Z</requestTime>
+		</user:deleteUserType>
+	</soapenv:Body>
+</soapenv:Envelope>
+\end{lstlisting}
+
+\textbf{Erwartet:}
+\begin{lstlisting}[language=XML, caption={deleteUser-Anfrage mit fehlerhaften Daten Output}]
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+  <SOAP-ENV:Header/>
+  <SOAP-ENV:Body>
+     <ns3:commonReturnType xmlns:ns3="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+        <returnCode>ERROR</returnCode>
+        <errorMessage>Payload validation for delete user failed for idpUserId=11111111111111111111111</errorMessage>
+     </ns3:commonReturnType>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
 \end{lstlisting}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -471,150 +340,37 @@
 \textbf{Test-ID: 10}
 
 \textbf{Beschreibung:} \\
-\texttt{addUser} wird fehlschlagen.
+\texttt{deleteUser} Nutzer nicht gefunden.
 
 \textbf{Input:}
 \begin{lstlisting}[language=XML, caption={deleteUser-Anfrage mit fehlerhaften Daten Input}]
-<user:addUserType xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
-  <idpUserId>123</idpUserId>
-  <orgId>1</orgId>
-  <igRoles>EL_OFFERT</igRoles>
-  <orgRegNo>10</orgRegNo>
-  <primaryOU>
-    <id>1</id>
-    <regNo>10</regNo>
-    <type>test</type>
-    <name>test</name>
-  </primaryOU>
-  <employed>true</employed>
-  <givenName>max</givenName>
-  <surname>mustermann</surname>
-  <userEmail>max.mustermann1@email.ch</userEmail>
-  <userOfficePhone>123</userOfficePhone>
-  <userMobilePhone>123</userMobilePhone>
-  <userBirthday>1970-01-01T00:00:00Z</userBirthday>
-  <userSex>M</userSex>
-  <userLanguage>DE</userLanguage>
-  <validFrom>2024-01-01T00:00:00Z</validFrom>
-  <validTo>2024-12-31T00:00:00Z</validTo>
-  <userType>PERSONAL</userType>
-  <userCategory>BROKER</userCategory>
-  <creationDate>2024-01-01T00:00:00Z</creationDate>
-  <creationUser>admin</creationUser>
-  <modificationDate>2024-01-01T00:00:00Z</modificationDate>
-  <modificationUser>admin</modificationUser>
-  <requestId>1</requestId>
-  <requestTime>2024-01-01T00:00:10Z</requestTime>
-</user:addUserType>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+	<soapenv:Header/>
+	<soapenv:Body>
+		<user:deleteUserType xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+		<idpUserId>999</idpUserId>
+		<deletionDate>2024-12-01T00:00:00Z</deletionDate>
+		<deletionUser>admin</deletionUser>
+		<requestId>1</requestId>
+		<requestTime>2024-12-01T00:00:10Z</requestTime>
+		</user:deleteUserType>
+	</soapenv:Body>
+</soapenv:Envelope>
 \end{lstlisting}
 
 \textbf{Erwartet:}
 \begin{lstlisting}[language=XML, caption={deleteUser-Anfrage mit fehlerhaften Daten Output}]
-<ns3:commonReturnType xmlns:ns3="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
-  <returnCode>ERROR</returnCode>
-  <errorMessage>Processing add user failed for idpUserId=123</errorMessage>
-</ns3:commonReturnType>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+  <SOAP-ENV:Header/>
+  <SOAP-ENV:Body>
+     <ns3:commonReturnType xmlns:ns3="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+        <returnCode>USER_NOT_FOUND</returnCode>
+        <errorMessage>User to be deleted not found idpUserId=999</errorMessage>
+     </ns3:commonReturnType>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
 \end{lstlisting}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\textbf{Test-ID: 11}
-
-\textbf{Beschreibung:} \\
-\texttt{addUser} wird fehlschlagen.
-
-\textbf{Input:}
-\begin{lstlisting}[language=XML, caption={deleteUser-Anfrage mit fehlerhaften Daten Input}]
-<user:addUserType xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
-  <idpUserId>123</idpUserId>
-  <orgId>1</orgId>
-  <igRoles>EL_OFFERT</igRoles>
-  <orgRegNo>10</orgRegNo>
-  <primaryOU>
-    <id>1</id>
-    <regNo>10</regNo>
-    <type>test</type>
-    <name>test</name>
-  </primaryOU>
-  <employed>true</employed>
-  <givenName>max</givenName>
-  <surname>mustermann</surname>
-  <userEmail>max.mustermann1@email.ch</userEmail>
-  <userOfficePhone>123</userOfficePhone>
-  <userMobilePhone>123</userMobilePhone>
-  <userBirthday>1970-01-01T00:00:00Z</userBirthday>
-  <userSex>M</userSex>
-  <userLanguage>DE</userLanguage>
-  <validFrom>2024-01-01T00:00:00Z</validFrom>
-  <validTo>2024-12-31T00:00:00Z</validTo>
-  <userType>PERSONAL</userType>
-  <userCategory>BROKER</userCategory>
-  <creationDate>2024-01-01T00:00:00Z</creationDate>
-  <creationUser>admin</creationUser>
-  <modificationDate>2024-01-01T00:00:00Z</modificationDate>
-  <modificationUser>admin</modificationUser>
-  <requestId>1</requestId>
-  <requestTime>2024-01-01T00:00:10Z</requestTime>
-</user:addUserType>
-\end{lstlisting}
-
-\textbf{Erwartet:}
-\begin{lstlisting}[language=XML, caption={deleteUser-Anfrage mit fehlerhaften Daten Output}]
-<ns3:commonReturnType xmlns:ns3="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
-  <returnCode>ERROR</returnCode>
-  <errorMessage>Processing add user failed for idpUserId=123</errorMessage>
-</ns3:commonReturnType>
-\end{lstlisting}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\textbf{Test-ID: 12}
-
-\textbf{Beschreibung:} \\
-\texttt{addUser} wird fehlschlagen.
-
-\textbf{Input:}
-\begin{lstlisting}[language=XML, caption={deleteUser-Anfrage mit fehlerhaften Daten Input}]
-<user:addUserType xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
-  <idpUserId>123</idpUserId>
-  <orgId>1</orgId>
-  <igRoles>EL_OFFERT</igRoles>
-  <orgRegNo>10</orgRegNo>
-  <primaryOU>
-    <id>1</id>
-    <regNo>10</regNo>
-    <type>test</type>
-    <name>test</name>
-  </primaryOU>
-  <employed>true</employed>
-  <givenName>max</givenName>
-  <surname>mustermann</surname>
-  <userEmail>max.mustermann1@email.ch</userEmail>
-  <userOfficePhone>123</userOfficePhone>
-  <userMobilePhone>123</userMobilePhone>
-  <userBirthday>1970-01-01T00:00:00Z</userBirthday>
-  <userSex>M</userSex>
-  <userLanguage>DE</userLanguage>
-  <validFrom>2024-01-01T00:00:00Z</validFrom>
-  <validTo>2024-12-31T00:00:00Z</validTo>
-  <userType>PERSONAL</userType>
-  <userCategory>BROKER</userCategory>
-  <creationDate>2024-01-01T00:00:00Z</creationDate>
-  <creationUser>admin</creationUser>
-  <modificationDate>2024-01-01T00:00:00Z</modificationDate>
-  <modificationUser>admin</modificationUser>
-  <requestId>1</requestId>
-  <requestTime>2024-01-01T00:00:10Z</requestTime>
-</user:addUserType>
-\end{lstlisting}
-
-\textbf{Erwartet:}
-\begin{lstlisting}[language=XML, caption={deleteUser-Anfrage mit fehlerhaften Daten Output}]
-<ns3:commonReturnType xmlns:ns3="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
-  <returnCode>ERROR</returnCode>
-  <errorMessage>Processing add user failed for idpUserId=123</errorMessage>
-</ns3:commonReturnType>
-\end{lstlisting}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Neuer Endpunkt getUser
@@ -623,200 +379,92 @@
 
 \subsection{Endpoint: \texttt{getUser}}
 
-\textbf{Test-ID: 13}
+\textbf{Test-ID: 11}
 
 \textbf{Beschreibung:} \\
-\texttt{addUser} wird fehlschlagen.
+\texttt{getUser} Nutzer wird erfolgreich gefunden und IDP-Nummer existiert.
 
 \textbf{Input:}
 \begin{lstlisting}[language=XML, caption={getUser-Anfrage mit fehlerhaften Daten Input}]
-<user:addUserType xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
-  <idpUserId>123</idpUserId>
-  <orgId>1</orgId>
-  <igRoles>EL_OFFERT</igRoles>
-  <orgRegNo>10</orgRegNo>
-  <primaryOU>
-    <id>1</id>
-    <regNo>10</regNo>
-    <type>test</type>
-    <name>test</name>
-  </primaryOU>
-  <employed>true</employed>
-  <givenName>max</givenName>
-  <surname>mustermann</surname>
-  <userEmail>max.mustermann1@email.ch</userEmail>
-  <userOfficePhone>123</userOfficePhone>
-  <userMobilePhone>123</userMobilePhone>
-  <userBirthday>1970-01-01T00:00:00Z</userBirthday>
-  <userSex>M</userSex>
-  <userLanguage>DE</userLanguage>
-  <validFrom>2024-01-01T00:00:00Z</validFrom>
-  <validTo>2024-12-31T00:00:00Z</validTo>
-  <userType>PERSONAL</userType>
-  <userCategory>BROKER</userCategory>
-  <creationDate>2024-01-01T00:00:00Z</creationDate>
-  <creationUser>admin</creationUser>
-  <modificationDate>2024-01-01T00:00:00Z</modificationDate>
-  <modificationUser>admin</modificationUser>
-  <requestId>1</requestId>
-  <requestTime>2024-01-01T00:00:10Z</requestTime>
-</user:addUserType>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+  <soapenv:Header/>
+  <soapenv:Body>
+      <user:getUserStatusType xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+          <idpUserId>004</idpUserId>
+          <requestId>1</requestId>
+          <requestTime>2024-12-01T00:00:00Z</requestTime>
+      </user:getUserStatusType>
+  </soapenv:Body>
+</soapenv:Envelope>
 \end{lstlisting}
 
 \textbf{Erwartet:}
 \begin{lstlisting}[language=XML, caption={getUser-Anfrage mit fehlerhaften Daten Output}]
-<ns3:commonReturnType xmlns:ns3="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
-  <returnCode>ERROR</returnCode>
-  <errorMessage>Processing add user failed for idpUserId=123</errorMessage>
-</ns3:commonReturnType>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+  <SOAP-ENV:Header/>
+  <SOAP-ENV:Body>
+     <ns3:userStatusReturnType xmlns:ns3="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+        <returnCode>OK</returnCode>
+        <userStatus>OK</userStatus>
+     </ns3:userStatusReturnType>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
 \end{lstlisting}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\textbf{Test-ID: 12}
+
+\textbf{Beschreibung:} \\
+\texttt{getUser} Nutzer nicht gefunden.
+
+\textbf{Input:}
+\begin{lstlisting}[language=XML, caption={getUser-Anfrage mit fehlerhaften Daten Input}]
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+  <soapenv:Header/>
+  <soapenv:Body>
+      <user:getUserStatusType xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+          <idpUserId>999</idpUserId>
+          <requestId>1</requestId>
+          <requestTime>2024-12-01T00:00:00Z</requestTime>
+      </user:getUserStatusType>
+  </soapenv:Body>
+</soapenv:Envelope>
+\end{lstlisting}
+
+\textbf{Erwartet:}
+\begin{lstlisting}[language=XML, caption={getUser-Anfrage mit fehlerhaften Daten Output}]
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+  <SOAP-ENV:Header/>
+  <SOAP-ENV:Body>
+     <ns3:userStatusReturnType xmlns:ns3="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+        <returnCode>USER_NOT_FOUND</returnCode>
+        <errorMessage>User status not found for idpUserId=999</errorMessage>
+     </ns3:userStatusReturnType>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+\end{lstlisting}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Sonstige Tests
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\clearpage
+
+\subsection{Endpoint: \texttt{addUser, updateUser, deleteUser, getUser}}
+Sollte der Service nicht ansprechbar sein, wird jegliche Anfrage mit einem Fehler beantwortet.
 
 \textbf{Test-ID: 14}
 
 \textbf{Beschreibung:} \\
-\texttt{addUser} wird fehlschlagen.
+\texttt{addUser, updateUser, deleteUser, getUser} Service ist nicht erreichbar.
 
 \textbf{Input:}
 \begin{lstlisting}[language=XML, caption={getUser-Anfrage mit fehlerhaften Daten Input}]
-<user:addUserType xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
-  <idpUserId>123</idpUserId>
-  <orgId>1</orgId>
-  <igRoles>EL_OFFERT</igRoles>
-  <orgRegNo>10</orgRegNo>
-  <primaryOU>
-    <id>1</id>
-    <regNo>10</regNo>
-    <type>test</type>
-    <name>test</name>
-  </primaryOU>
-  <employed>true</employed>
-  <givenName>max</givenName>
-  <surname>mustermann</surname>
-  <userEmail>max.mustermann1@email.ch</userEmail>
-  <userOfficePhone>123</userOfficePhone>
-  <userMobilePhone>123</userMobilePhone>
-  <userBirthday>1970-01-01T00:00:00Z</userBirthday>
-  <userSex>M</userSex>
-  <userLanguage>DE</userLanguage>
-  <validFrom>2024-01-01T00:00:00Z</validFrom>
-  <validTo>2024-12-31T00:00:00Z</validTo>
-  <userType>PERSONAL</userType>
-  <userCategory>BROKER</userCategory>
-  <creationDate>2024-01-01T00:00:00Z</creationDate>
-  <creationUser>admin</creationUser>
-  <modificationDate>2024-01-01T00:00:00Z</modificationDate>
-  <modificationUser>admin</modificationUser>
-  <requestId>1</requestId>
-  <requestTime>2024-01-01T00:00:10Z</requestTime>
-</user:addUserType>
+  EGAL
 \end{lstlisting}
 
 \textbf{Erwartet:}
 \begin{lstlisting}[language=XML, caption={getUser-Anfrage mit fehlerhaften Daten Output}]
-<ns3:commonReturnType xmlns:ns3="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
-  <returnCode>ERROR</returnCode>
-  <errorMessage>Processing add user failed for idpUserId=123</errorMessage>
-</ns3:commonReturnType>
-\end{lstlisting}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\textbf{Test-ID: 15}
-
-\textbf{Beschreibung:} \\
-\texttt{addUser} wird fehlschlagen.
-
-\textbf{Input:}
-\begin{lstlisting}[language=XML, caption={getUser-Anfrage mit fehlerhaften Daten Input}]
-<user:addUserType xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
-  <idpUserId>123</idpUserId>
-  <orgId>1</orgId>
-  <igRoles>EL_OFFERT</igRoles>
-  <orgRegNo>10</orgRegNo>
-  <primaryOU>
-    <id>1</id>
-    <regNo>10</regNo>
-    <type>test</type>
-    <name>test</name>
-  </primaryOU>
-  <employed>true</employed>
-  <givenName>max</givenName>
-  <surname>mustermann</surname>
-  <userEmail>max.mustermann1@email.ch</userEmail>
-  <userOfficePhone>123</userOfficePhone>
-  <userMobilePhone>123</userMobilePhone>
-  <userBirthday>1970-01-01T00:00:00Z</userBirthday>
-  <userSex>M</userSex>
-  <userLanguage>DE</userLanguage>
-  <validFrom>2024-01-01T00:00:00Z</validFrom>
-  <validTo>2024-12-31T00:00:00Z</validTo>
-  <userType>PERSONAL</userType>
-  <userCategory>BROKER</userCategory>
-  <creationDate>2024-01-01T00:00:00Z</creationDate>
-  <creationUser>admin</creationUser>
-  <modificationDate>2024-01-01T00:00:00Z</modificationDate>
-  <modificationUser>admin</modificationUser>
-  <requestId>1</requestId>
-  <requestTime>2024-01-01T00:00:10Z</requestTime>
-</user:addUserType>
-\end{lstlisting}
-
-\textbf{Erwartet:}
-\begin{lstlisting}[language=XML, caption={getUser-Anfrage mit fehlerhaften Daten Output}]
-<ns3:commonReturnType xmlns:ns3="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
-  <returnCode>ERROR</returnCode>
-  <errorMessage>Processing add user failed for idpUserId=123</errorMessage>
-</ns3:commonReturnType>
-\end{lstlisting}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\textbf{Test-ID: 16}
-
-\textbf{Beschreibung:} \\
-\texttt{addUser} wird fehlschlagen.
-
-\textbf{Input:}
-\begin{lstlisting}[language=XML, caption={getUser-Anfrage mit fehlerhaften Daten Input}]
-<user:addUserType xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
-  <idpUserId>123</idpUserId>
-  <orgId>1</orgId>
-  <igRoles>EL_OFFERT</igRoles>
-  <orgRegNo>10</orgRegNo>
-  <primaryOU>
-    <id>1</id>
-    <regNo>10</regNo>
-    <type>test</type>
-    <name>test</name>
-  </primaryOU>
-  <employed>true</employed>
-  <givenName>max</givenName>
-  <surname>mustermann</surname>
-  <userEmail>max.mustermann1@email.ch</userEmail>
-  <userOfficePhone>123</userOfficePhone>
-  <userMobilePhone>123</userMobilePhone>
-  <userBirthday>1970-01-01T00:00:00Z</userBirthday>
-  <userSex>M</userSex>
-  <userLanguage>DE</userLanguage>
-  <validFrom>2024-01-01T00:00:00Z</validFrom>
-  <validTo>2024-12-31T00:00:00Z</validTo>
-  <userType>PERSONAL</userType>
-  <userCategory>BROKER</userCategory>
-  <creationDate>2024-01-01T00:00:00Z</creationDate>
-  <creationUser>admin</creationUser>
-  <modificationDate>2024-01-01T00:00:00Z</modificationDate>
-  <modificationUser>admin</modificationUser>
-  <requestId>1</requestId>
-  <requestTime>2024-01-01T00:00:10Z</requestTime>
-</user:addUserType>
-\end{lstlisting}
-
-\textbf{Erwartet:}
-\begin{lstlisting}[language=XML, caption={getUser-Anfrage mit fehlerhaften Daten Output}]
-<ns3:commonReturnType xmlns:ns3="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
-  <returnCode>ERROR</returnCode>
-  <errorMessage>Processing add user failed for idpUserId=123</errorMessage>
-</ns3:commonReturnType>
+  null/empty
 \end{lstlisting}
