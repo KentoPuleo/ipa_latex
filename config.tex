@@ -65,6 +65,7 @@
 \usepackage{lastpage}
 \usepackage{lipsum}
 \usepackage{listings}
+\usepackage{textcomp}
 \usepackage{xcolor}
 \usepackage{tcolorbox}
 \tcbuselibrary{listingsutf8}
@@ -75,7 +76,14 @@
   breaklines=true,
   columns=fullflexible,
   frame=single,
-  backgroundcolor=\color{white}
+  backgroundcolor=\color{white},
+  literate=
+    {ä}{{\"a}}1 {ö}{{\"o}}1 {ü}{{\"u}}1
+    {Ä}{{\"A}}1 {Ö}{{\"O}}1 {Ü}{{\"U}}1
+    {ß}{{\ss}}1
+    {é}{{\'e}}1 {è}{{\`e}}1
+    {“}{{``}}1 {”}{{''}}1
+    {-}{{--}}1,
 }
 \usepackage{multicol}
 \usepackage{multirow}
@@ -262,4 +270,20 @@
   identifierstyle=\color{black},
   basicstyle=\ttfamily\small,
   showstringspaces=false
+}
+
+\lstdefinelanguage{TypeScript}{
+  keywords={typeof, new, true, false, catch, function, return, null, catch, switch, var, let, if, in, while, do, else, case, break, await, async, const, from, export, import, class, extends, implements, interface, public, private, protected},
+  keywordstyle=\color{blue}\bfseries,
+  ndkeywords={string, number, boolean, any, void, Promise},
+  ndkeywordstyle=\color{teal}\bfseries,
+  identifierstyle=\color{black},
+  sensitive=true,
+  comment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  commentstyle=\color{gray}\ttfamily,
+  stringstyle=\color{orange},
+  morestring=[b]',
+  morestring=[b]",
+  morestring=[b]`
 }

@@ -3,33 +3,31 @@
 \textbf{Test-ID: 1}
 
 \textbf{Beschreibung:} \\
-\texttt{addUser} Nutzer erhält erfolgreich eine IDP-Nummer.
+\texttt{addUser} - Nutzer erhält erfolgreich eine IDP-Nummer.
 
 \textbf{Input:}
-\begin{lstlisting}[language=XML, caption={addUser-Anfrage mit fehlerhaften Daten Input}]
-  <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+\begin{lstlisting}[language=XML, caption={addUser-Anfrage - Erfolgreiche Registrierung}]
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
   <soapenv:Header/>
   <soapenv:Body>
-      <user:addUserType xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
-          <idpUserId>100</idpUserId>
-          ...
-          <givenName>Marco</givenName>
-          <surname>Frei</surname>
-          <userEmail>marco.frei@pax.ch</userEmail>
-          ...
-      </user:addUserType>
+    <user:addUserType>
+      <idpUserId>100</idpUserId>
+      <givenName>Marco</givenName>
+      <surname>Frei</surname>
+      <userEmail>marco.frei@pax.ch</userEmail>
+    </user:addUserType>
   </soapenv:Body>
 </soapenv:Envelope>
 \end{lstlisting}
 
 \textbf{Erwartet:}
-\begin{lstlisting}[language=XML, caption={addUser-Anfrage mit fehlerhaften Daten Output}]
+\begin{lstlisting}[language=XML, caption={addUser - Erfolgreiche Antwort}]
 <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
   <SOAP-ENV:Header/>
   <SOAP-ENV:Body>
-     <ns3:commonReturnType xmlns:ns3="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
-        <returnCode>OK</returnCode>
-     </ns3:commonReturnType>
+    <ns3:commonReturnType xmlns:ns3="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+      <returnCode>OK</returnCode>
+    </ns3:commonReturnType>
   </SOAP-ENV:Body>
 </SOAP-ENV:Envelope>
 \end{lstlisting}
@@ -39,34 +37,32 @@
 \textbf{Test-ID: 2}
 
 \textbf{Beschreibung:} \\
-\texttt{addUser} Nutzer hat bereits eine IDP-Nummer.
+\texttt{addUser} - Nutzer mit dieser IDP-Nummer existiert bereits.
 
 \textbf{Input:}
-\begin{lstlisting}[language=XML, caption={addUser-Anfrage mit fehlerhaften Daten Input}]
+\begin{lstlisting}[language=XML, caption={addUser-Anfrage - IDP-Nummer bereits vergeben}]
 <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
   <soapenv:Header/>
   <soapenv:Body>
-      <user:addUserType xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
-          <idpUserId>101</idpUserId>
-          ...
-          <givenName>Max</givenName>
-          <surname>Mustermann</surname>
-          <userEmail>max.mustermann@pax.ch</userEmail>
-          ...
-      </user:addUserType>
+    <user:addUserType>
+      <idpUserId>101</idpUserId>
+      <givenName>Max</givenName>
+      <surname>Mustermann</surname>
+      <userEmail>max.mustermann@pax.ch</userEmail>
+    </user:addUserType>
   </soapenv:Body>
 </soapenv:Envelope>
 \end{lstlisting}
 
 \textbf{Erwartet:}
-\begin{lstlisting}[language=XML, caption={addUser-Anfrage mit fehlerhaften Daten Output}]
+\begin{lstlisting}[language=XML, caption={addUser - Nutzer existiert bereits}]
 <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
   <SOAP-ENV:Header/>
   <SOAP-ENV:Body>
-     <ns3:commonReturnType xmlns:ns3="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
-        <returnCode>USER_EXISTS</returnCode>
-        <errorMessage>User already exists with idpUserId=101</errorMessage>
-     </ns3:commonReturnType>
+    <ns3:commonReturnType xmlns:ns3="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+      <returnCode>USER_EXISTS</returnCode>
+      <errorMessage>User already exists with idpUserId=101</errorMessage>
+    </ns3:commonReturnType>
   </SOAP-ENV:Body>
 </SOAP-ENV:Envelope>
 \end{lstlisting}
@@ -76,34 +72,31 @@
 \textbf{Test-ID: 3}
 
 \textbf{Beschreibung:} \\
-\texttt{addUser} Payload unvollständig.
+\texttt{addUser} - Payload ist unvollständig (z.B. fehlt Nachname).
 
 \textbf{Input:}
-\begin{lstlisting}[language=XML, caption={addUser-Anfrage mit fehlerhaften Daten Input}]   
-  <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+\begin{lstlisting}[language=XML, caption={addUser-Anfrage - Fehlender Nachname}]
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
   <soapenv:Header/>
   <soapenv:Body>
-      <user:addUserType xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
-          <idpUserId>103</idpUserId>
-          ...
-          <givenName>Marco</givenName>
-          
-          <userEmail>marco.frei@pax.ch</userEmail>
-          ...
-      </user:addUserType>
+    <user:addUserType>
+      <idpUserId>103</idpUserId>
+      <givenName>Marco</givenName>
+      <userEmail>marco.frei@pax.ch</userEmail>
+    </user:addUserType>
   </soapenv:Body>
 </soapenv:Envelope>
 \end{lstlisting}
-  
+
 \textbf{Erwartet:}
-\begin{lstlisting}[language=XML, caption={addUser-Anfrage mit fehlerhaften Daten Output}]
+\begin{lstlisting}[language=XML, caption={addUser - Ungültiger Payload}]
 <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
   <SOAP-ENV:Header/>
   <SOAP-ENV:Body>
-     <ns3:commonReturnType xmlns:ns3="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
-        <returnCode>ERROR</returnCode>
-        <errorMessage>Payload validation failed for idpUserId=111</errorMessage>
-     </ns3:commonReturnType>
+    <ns3:commonReturnType xmlns:ns3="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+      <returnCode>ERROR</returnCode>
+      <errorMessage>Payload validation failed for idpUserId=103</errorMessage>
+    </ns3:commonReturnType>
   </SOAP-ENV:Body>
 </SOAP-ENV:Envelope>
 \end{lstlisting}
@@ -113,37 +106,71 @@
 \textbf{Test-ID: 4}
 
 \textbf{Beschreibung:} \\
-\texttt{addUser} Email-Adresse kann nicht gefunden werden.
+\texttt{addUser} - E-Mail-Adresse kann nicht verarbeitet werden (z.B. existiert nicht im internen System).
 
 \textbf{Input:}
-\begin{lstlisting}[language=XML, caption={addUser-Anfrage mit fehlerhaften Daten Input}]
-  <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+\begin{lstlisting}[language=XML, caption={addUser-Anfrage - Falsche E-Mail}]
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
   <soapenv:Header/>
   <soapenv:Body>
-      <user:addUserType xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
-          <idpUserId>104</idpUserId>
-          ...
-          <givenName>Marco</givenName>
-          <surname>Frei</surname>
-          <userEmail>marco.frei1@bug.ch</userEmail>
-          ...
-      </user:addUserType>
+    <user:addUserType>
+      <idpUserId>104</idpUserId>
+      <givenName>Marco</givenName>
+      <surname>Frei</surname>
+      <userEmail>marco.frei1@bug.ch</userEmail>
+    </user:addUserType>
   </soapenv:Body>
 </soapenv:Envelope>
 \end{lstlisting}
 
 \textbf{Erwartet:}
-\begin{lstlisting}[language=XML, caption={addUser-Anfrage mit fehlerhaften Daten Output}]
+\begin{lstlisting}[language=XML, caption={addUser - E-Mail nicht gefunden}]
 <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
   <SOAP-ENV:Header/>
   <SOAP-ENV:Body>
-     <ns3:commonReturnType xmlns:ns3="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
-        <returnCode>ERROR</returnCode>
-        <errorMessage>Processing add user failed for idpUserId=104</errorMessage>
-     </ns3:commonReturnType>
+    <ns3:commonReturnType xmlns:ns3="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+      <returnCode>ERROR</returnCode>
+      <errorMessage>Processing add user failed for idpUserId=104</errorMessage>
+    </ns3:commonReturnType>
   </SOAP-ENV:Body>
 </SOAP-ENV:Envelope>
 \end{lstlisting}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\textbf{Test-ID: 5}
+
+\textbf{Beschreibung:} \\
+\texttt{addUser} - Es wurden keine Nutzerdaten übermittelt (leere Felder).
+
+\textbf{Input:}
+\begin{lstlisting}[language=XML, caption={addUser-Anfrage - Leere Felder}]
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <user:addUserType>
+      <idpUserId></idpUserId>
+      <givenName></givenName>
+      <surname></surname>
+      <userEmail></userEmail>
+    </user:addUserType>
+  </soapenv:Body>
+</soapenv:Envelope>
+\end{lstlisting}
+
+\textbf{Erwartet:}
+\begin{lstlisting}[language=XML, caption={addUser - Verarbeitung fehlgeschlagen}]
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+  <SOAP-ENV:Header/>
+  <SOAP-ENV:Body>
+    <ns3:commonReturnType xmlns:ns3="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+      <returnCode>ERROR</returnCode>
+      <errorMessage>Processing add user failed for idpUserId=</errorMessage>
+    </ns3:commonReturnType>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+\end{lstlisting}
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -152,73 +179,34 @@
 \clearpage
 \subsection{Endpoint: \texttt{updateUser}}
 
-\textbf{Test-ID: 5}
-
-\textbf{Beschreibung:} \\
-\texttt{updateUser} Nutzer erhält erfolgreich eine neue IDP-Nummer.
-
-\textbf{Input:}
-\begin{lstlisting}[language=XML, caption={updateUser-Anfrage mit fehlerhaften Daten Input}]
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
-  <soapenv:Header/>
-  <soapenv:Body>
-      <user:updateUserType xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
-          <idpUserId>200</idpUserId>
-          ...
-          <givenName>Heidi</givenName>
-          <surname>Meier</surname>
-          <userEmail>heidi.meier@pax.ch</userEmail>
-          ...
-      </user:addUserType>
-  </soapenv:Body>
-</soapenv:Envelope>
-\end{lstlisting}
-
-\textbf{Erwartet:}
-\begin{lstlisting}[language=XML, caption={updateUser-Anfrage mit fehlerhaften Daten Output}]
-<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
-  <SOAP-ENV:Header/>
-  <SOAP-ENV:Body>
-     <ns3:commonReturnType xmlns:ns3="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
-        <returnCode>OK</returnCode>
-     </ns3:commonReturnType>
-  </SOAP-ENV:Body>
-</SOAP-ENV:Envelope>
-\end{lstlisting}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 \textbf{Test-ID: 6}
 
 \textbf{Beschreibung:} \\
-\texttt{updateUser} Gesuchter Nutzer nicht gefunden.
+\texttt{updateUser} - Nutzer wird erfolgreich aktualisiert.
 
 \textbf{Input:}
-\begin{lstlisting}[language=XML, caption={updateUser-Anfrage mit fehlerhaften Daten Input}]
+\begin{lstlisting}[language=XML, caption={updateUser-Anfrage - Erfolgreiche Aktualisierung}]
 <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
   <soapenv:Header/>
   <soapenv:Body>
-      <user:updateUserType xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
-          <idpUserId>201</idpUserId>
-          ...
-          <givenName>Heidi</givenName>
-          <surname>Meier</surname>
-          <userEmail>heidi.meier1@bug.ch</userEmail>
-          ...
-      </user:addUserType>
+    <user:updateUserType>
+      <idpUserId>200</idpUserId>
+      <givenName>Laura</givenName>
+      <surname>Schmidt</surname>
+      <userEmail>laura.schmidt@pax.ch</userEmail>
+    </user:updateUserType>
   </soapenv:Body>
 </soapenv:Envelope>
 \end{lstlisting}
 
 \textbf{Erwartet:}
-\begin{lstlisting}[language=XML, caption={updateUser-Anfrage mit fehlerhaften Daten Output}]
+\begin{lstlisting}[language=XML, caption={updateUser - Erfolgreiche Antwort}]
 <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
   <SOAP-ENV:Header/>
   <SOAP-ENV:Body>
-     <ns3:commonReturnType xmlns:ns3="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
-        <returnCode>USER_NOT_FOUND</returnCode>
-        <errorMessage>User cannot update for idpUserId=201</errorMessage>
-     </ns3:commonReturnType>
+    <ns3:commonReturnType xmlns:ns3="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+      <returnCode>OK</returnCode>
+    </ns3:commonReturnType>
   </SOAP-ENV:Body>
 </SOAP-ENV:Envelope>
 \end{lstlisting}
@@ -228,73 +216,67 @@
 \textbf{Test-ID: 7}
 
 \textbf{Beschreibung:} \\
-\texttt{updateUser} Payload unvollständig.
+\texttt{updateUser} - Gesuchter Nutzer nicht vorhanden.
 
 \textbf{Input:}
-\begin{lstlisting}[language=XML, caption={updateUser-Anfrage mit fehlerhaften Daten Input}]
+\begin{lstlisting}[language=XML, caption={updateUser-Anfrage - Nutzer nicht vorhanden}]
 <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
   <soapenv:Header/>
   <soapenv:Body>
-      <user:updateUserType xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
-        <idpUserId>111</idpUserId>
-        ...
-        <givenName>Marco</givenName>
-        
-        <userEmail>marco.frei@pax.ch</userEmail>
-        ...
-      </user:addUserType>
+    <user:updateUserType>
+      <idpUserId>201</idpUserId>
+      <givenName>Heidi</givenName>
+      <surname>Meier</surname>
+      <userEmail>heidi.meier1@bug.ch</userEmail>
+    </user:updateUserType>
   </soapenv:Body>
 </soapenv:Envelope>
 \end{lstlisting}
 
 \textbf{Erwartet:}
-\begin{lstlisting}[language=XML, caption={updateUser-Anfrage mit fehlerhaften Daten Output}]
+\begin{lstlisting}[language=XML, caption={updateUser - Nutzer nicht gefunden}]
 <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
   <SOAP-ENV:Header/>
   <SOAP-ENV:Body>
-     <ns3:commonReturnType xmlns:ns3="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
-        <returnCode>ERROR</returnCode>
-        <errorMessage>Payload validation failed for idpUserId=111</errorMessage>
-     </ns3:commonReturnType>
+    <ns3:commonReturnType xmlns:ns3="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+      <returnCode>USER_NOT_FOUND</returnCode>
+      <errorMessage>User cannot update for idpUserId=201</errorMessage>
+    </ns3:commonReturnType>
   </SOAP-ENV:Body>
 </SOAP-ENV:Envelope>
 \end{lstlisting}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Neuer Endpunkt deleteUser
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\clearpage
-\subsection{Endpoint: \texttt{deleteUser}}
 
 \textbf{Test-ID: 8}
 
 \textbf{Beschreibung:} \\
-\texttt{deleteUser} IDP-Nummer wird erfolgreich gelöscht.
+\texttt{updateUser} - Payload unvollständig (z.B. fehlt Nachname).
 
 \textbf{Input:}
-\begin{lstlisting}[language=XML, caption={deleteUser-Anfrage mit fehlerhaften Daten Input}]
+\begin{lstlisting}[language=XML, caption={updateUser-Anfrage - Unvollständiger Payload}]
 <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
-	<soapenv:Header/>
-	<soapenv:Body>
-		<user:deleteUserType xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
-		<idpUserId>005</idpUserId>
-		<deletionDate>2024-12-01T00:00:00Z</deletionDate>
-		<deletionUser>admin</deletionUser>
-		<requestId>1</requestId>
-		<requestTime>2024-12-01T00:00:10Z</requestTime>
-		</user:deleteUserType>
-	</soapenv:Body>
+  <soapenv:Header/>
+  <soapenv:Body>
+    <user:updateUserType>
+      <idpUserId>111</idpUserId>
+      <givenName>Marco</givenName>
+      <userEmail>marco.frei@pax.ch</userEmail>
+      <!-- surname fehlt -->
+    </user:updateUserType>
+  </soapenv:Body>
 </soapenv:Envelope>
 \end{lstlisting}
 
 \textbf{Erwartet:}
-\begin{lstlisting}[language=XML, caption={deleteUser-Anfrage mit fehlerhaften Daten Output}]
+\begin{lstlisting}[language=XML, caption={updateUser - Fehlerhafte Nutzerdaten}]
 <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
   <SOAP-ENV:Header/>
   <SOAP-ENV:Body>
-     <ns3:commonReturnType xmlns:ns3="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
-        <returnCode>OK</returnCode>
-     </ns3:commonReturnType>
+    <ns3:commonReturnType xmlns:ns3="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+      <returnCode>ERROR</returnCode>
+      <errorMessage>Payload validation failed for idpUserId=111</errorMessage>
+    </ns3:commonReturnType>
   </SOAP-ENV:Body>
 </SOAP-ENV:Envelope>
 \end{lstlisting}
@@ -304,109 +286,108 @@
 \textbf{Test-ID: 9}
 
 \textbf{Beschreibung:} \\
-\texttt{deleteUser} Payload unvollständig.
+\texttt{updateUser} - Es wurden keine Nutzerdaten übermittelt (leere Felder).
 
 \textbf{Input:}
-\begin{lstlisting}[language=XML, caption={deleteUser-Anfrage mit fehlerhaften Daten Input}]
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
-	<soapenv:Header/>
-	<soapenv:Body>
-		<user:deleteUserType xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
-		<idpUserId>11111111111111111111111</idpUserId>
-		<deletionDate>2024-12-01T00:00:00Z</deletionDate>
-		<deletionUser>admin</deletionUser>
-		<requestId>1</requestId>
-		<requestTime>2024-12-01T00:00:10Z</requestTime>
-		</user:deleteUserType>
-	</soapenv:Body>
-</soapenv:Envelope>
-\end{lstlisting}
-
-\textbf{Erwartet:}
-\begin{lstlisting}[language=XML, caption={deleteUser-Anfrage mit fehlerhaften Daten Output}]
-<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
-  <SOAP-ENV:Header/>
-  <SOAP-ENV:Body>
-     <ns3:commonReturnType xmlns:ns3="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
-        <returnCode>ERROR</returnCode>
-        <errorMessage>Payload validation for delete user failed for idpUserId=11111111111111111111111</errorMessage>
-     </ns3:commonReturnType>
-  </SOAP-ENV:Body>
-</SOAP-ENV:Envelope>
-\end{lstlisting}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\textbf{Test-ID: 10}
-
-\textbf{Beschreibung:} \\
-\texttt{deleteUser} Nutzer nicht gefunden.
-
-\textbf{Input:}
-\begin{lstlisting}[language=XML, caption={deleteUser-Anfrage mit fehlerhaften Daten Input}]
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
-	<soapenv:Header/>
-	<soapenv:Body>
-		<user:deleteUserType xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
-		<idpUserId>999</idpUserId>
-		<deletionDate>2024-12-01T00:00:00Z</deletionDate>
-		<deletionUser>admin</deletionUser>
-		<requestId>1</requestId>
-		<requestTime>2024-12-01T00:00:10Z</requestTime>
-		</user:deleteUserType>
-	</soapenv:Body>
-</soapenv:Envelope>
-\end{lstlisting}
-
-\textbf{Erwartet:}
-\begin{lstlisting}[language=XML, caption={deleteUser-Anfrage mit fehlerhaften Daten Output}]
-<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
-  <SOAP-ENV:Header/>
-  <SOAP-ENV:Body>
-     <ns3:commonReturnType xmlns:ns3="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
-        <returnCode>USER_NOT_FOUND</returnCode>
-        <errorMessage>User to be deleted not found idpUserId=999</errorMessage>
-     </ns3:commonReturnType>
-  </SOAP-ENV:Body>
-</SOAP-ENV:Envelope>
-\end{lstlisting}
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Neuer Endpunkt getUser
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\clearpage
-
-\subsection{Endpoint: \texttt{getUser}}
-
-\textbf{Test-ID: 11}
-
-\textbf{Beschreibung:} \\
-\texttt{getUser} Nutzer wird erfolgreich gefunden und IDP-Nummer existiert.
-
-\textbf{Input:}
-\begin{lstlisting}[language=XML, caption={getUser-Anfrage mit fehlerhaften Daten Input}]
+\begin{lstlisting}[language=XML, caption={updateUser-Anfrage - Leere Felder}]
 <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
   <soapenv:Header/>
   <soapenv:Body>
-      <user:getUserStatusType xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
-          <idpUserId>004</idpUserId>
-          <requestId>1</requestId>
-          <requestTime>2024-12-01T00:00:00Z</requestTime>
-      </user:getUserStatusType>
+    <user:updateUserType>
+      <idpUserId></idpUserId>
+      <givenName></givenName>
+      <surname></surname>
+      <userEmail></userEmail>
+    </user:updateUserType>
   </soapenv:Body>
 </soapenv:Envelope>
 \end{lstlisting}
 
 \textbf{Erwartet:}
-\begin{lstlisting}[language=XML, caption={getUser-Anfrage mit fehlerhaften Daten Output}]
+\begin{lstlisting}[language=XML, caption={updateUser - Verarbeitung fehlgeschlagen}]
 <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
   <SOAP-ENV:Header/>
   <SOAP-ENV:Body>
-     <ns3:userStatusReturnType xmlns:ns3="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
-        <returnCode>OK</returnCode>
-        <userStatus>OK</userStatus>
-     </ns3:userStatusReturnType>
+    <ns3:commonReturnType xmlns:ns3="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+      <returnCode>USER_NOT_FOUND</returnCode>
+      <errorMessage>User cannot update for idpUserId=</errorMessage>
+    </ns3:commonReturnType>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+\end{lstlisting}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Neuer Endpunkt deleteUser
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\clearpage
+\subsection{Endpoint: \texttt{deleteUser}}
+
+\textbf{Test-ID: 10}
+
+\textbf{Beschreibung:} \\
+\texttt{deleteUser} - IDP-Nummer wird erfolgreich gelöscht.
+
+\textbf{Input:}
+\begin{lstlisting}[language=XML, caption={deleteUser-Anfrage - Erfolgreiche Löschung}]
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <user:deleteUserType>
+      <idpUserId>005</idpUserId>
+      <deletionDate>2024-12-01T00:00:00Z</deletionDate>
+      <deletionUser>admin</deletionUser>
+      <requestId>1</requestId>
+      <requestTime>2024-12-01T00:00:10Z</requestTime>
+    </user:deleteUserType>
+  </soapenv:Body>
+</soapenv:Envelope>
+\end{lstlisting}
+
+\textbf{Erwartet:}
+\begin{lstlisting}[language=XML, caption={deleteUser - Erfolgreiche Antwort}]
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+  <SOAP-ENV:Header/>
+  <SOAP-ENV:Body>
+    <ns3:commonReturnType xmlns:ns3="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+      <returnCode>OK</returnCode>
+    </ns3:commonReturnType>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+\end{lstlisting}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\textbf{Test-ID: 11}
+
+\textbf{Beschreibung:} \\
+\texttt{deleteUser} - Ungültige IDP-Nummer (z.B. zu lang, nicht vorhanden).
+
+\textbf{Input:}
+\begin{lstlisting}[language=XML, caption={deleteUser-Anfrage - Ungültige IDP-Nummer}]
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <user:deleteUserType>
+      <idpUserId>11111111111111111111111</idpUserId>
+      <deletionDate>2024-12-01T00:00:00Z</deletionDate>
+      <deletionUser>admin</deletionUser>
+      <requestId>1</requestId>
+      <requestTime>2024-12-01T00:00:10Z</requestTime>
+    </user:deleteUserType>
+  </soapenv:Body>
+</soapenv:Envelope>
+\end{lstlisting}
+
+\textbf{Erwartet:}
+\begin{lstlisting}[language=XML, caption={deleteUser - Fehlerhafte IDP-Nummer}]
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+  <SOAP-ENV:Header/>
+  <SOAP-ENV:Body>
+    <ns3:commonReturnType xmlns:ns3="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+      <returnCode>ERROR</returnCode>
+      <errorMessage>Payload validation for delete user failed for idpUserId=11111111111111111111111</errorMessage>
+    </ns3:commonReturnType>
   </SOAP-ENV:Body>
 </SOAP-ENV:Envelope>
 \end{lstlisting}
@@ -416,34 +397,181 @@
 \textbf{Test-ID: 12}
 
 \textbf{Beschreibung:} \\
-\texttt{getUser} Nutzer nicht gefunden.
+\texttt{deleteUser} - Nutzer nicht gefunden.
 
 \textbf{Input:}
-\begin{lstlisting}[language=XML, caption={getUser-Anfrage mit fehlerhaften Daten Input}]
+\begin{lstlisting}[language=XML, caption={deleteUser-Anfrage - Nutzer nicht gefunden}]
 <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
   <soapenv:Header/>
   <soapenv:Body>
-      <user:getUserStatusType xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
-          <idpUserId>999</idpUserId>
-          <requestId>1</requestId>
-          <requestTime>2024-12-01T00:00:00Z</requestTime>
-      </user:getUserStatusType>
+    <user:deleteUserType>
+      <idpUserId>999</idpUserId>
+      <deletionDate>2024-12-01T00:00:00Z</deletionDate>
+      <deletionUser>admin</deletionUser>
+      <requestId>1</requestId>
+      <requestTime>2024-12-01T00:00:10Z</requestTime>
+    </user:deleteUserType>
   </soapenv:Body>
 </soapenv:Envelope>
 \end{lstlisting}
 
 \textbf{Erwartet:}
-\begin{lstlisting}[language=XML, caption={getUser-Anfrage mit fehlerhaften Daten Output}]
+\begin{lstlisting}[language=XML, caption={deleteUser - Nutzer nicht vorhanden}]
 <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
   <SOAP-ENV:Header/>
   <SOAP-ENV:Body>
-     <ns3:userStatusReturnType xmlns:ns3="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
-        <returnCode>USER_NOT_FOUND</returnCode>
-        <errorMessage>User status not found for idpUserId=999</errorMessage>
-     </ns3:userStatusReturnType>
+    <ns3:commonReturnType xmlns:ns3="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+      <returnCode>USER_NOT_FOUND</returnCode>
+      <errorMessage>User to be deleted not found idpUserId=999</errorMessage>
+    </ns3:commonReturnType>
   </SOAP-ENV:Body>
 </SOAP-ENV:Envelope>
 \end{lstlisting}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\textbf{Test-ID: 13}
+
+\textbf{Beschreibung:} \\
+\texttt{deleteUser} - Keine IDP-Nummer übermittelt (leeres Feld).
+
+\textbf{Input:}
+\begin{lstlisting}[language=XML, caption={deleteUser-Anfrage - Leerer Wert}]
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <user:deleteUserType>
+      <idpUserId></idpUserId>
+      <deletionDate>2024-12-01T00:00:00Z</deletionDate>
+      <deletionUser>admin</deletionUser>
+      <requestId>1</requestId>
+      <requestTime>2024-12-01T00:00:10Z</requestTime>
+    </user:deleteUserType>
+  </soapenv:Body>
+</soapenv:Envelope>
+\end{lstlisting}
+
+\textbf{Erwartet:}
+\begin{lstlisting}[language=XML, caption={deleteUser - Kein Nutzer angegeben}]
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+  <SOAP-ENV:Header/>
+  <SOAP-ENV:Body>
+    <ns3:commonReturnType xmlns:ns3="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+      <returnCode>USER_NOT_FOUND</returnCode>
+      <errorMessage>User to be deleted not found idpUserId=</errorMessage>
+    </ns3:commonReturnType>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+\end{lstlisting}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Neuer Endpunkt getUser
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\clearpage
+\subsection{Endpoint: \texttt{getUserStatus}}
+
+\textbf{Test-ID: 14}
+
+\textbf{Beschreibung:} \\
+\texttt{getUserStatus} - Nutzer wird erfolgreich gefunden, IDP-Nummer existiert.
+
+\textbf{Input:}
+\begin{lstlisting}[language=XML, caption={getUserStatus-Anfrage - Nutzer vorhanden}]
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <user:getUserStatusType>
+      <idpUserId>004</idpUserId>
+      <requestId>1</requestId>
+      <requestTime>2024-12-01T00:00:00Z</requestTime>
+    </user:getUserStatusType>
+  </soapenv:Body>
+</soapenv:Envelope>
+\end{lstlisting}
+
+\textbf{Erwartet:}
+\begin{lstlisting}[language=XML, caption={getUserStatus - Erfolgreiche Antwort}]
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+  <SOAP-ENV:Header/>
+  <SOAP-ENV:Body>
+    <ns3:userStatusReturnType xmlns:ns3="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+      <returnCode>OK</returnCode>
+      <userStatus>OK</userStatus>
+    </ns3:userStatusReturnType>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+\end{lstlisting}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\textbf{Test-ID: 15}
+
+\textbf{Beschreibung:} \\
+\texttt{getUserStatus} - Nutzer nicht gefunden.
+
+\textbf{Input:}
+\begin{lstlisting}[language=XML, caption={getUserStatus-Anfrage - Nutzer nicht vorhanden}]
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <user:getUserStatusType>
+      <idpUserId>999</idpUserId>
+      <requestId>1</requestId>
+      <requestTime>2024-12-01T00:00:00Z</requestTime>
+    </user:getUserStatusType>
+  </soapenv:Body>
+</soapenv:Envelope>
+\end{lstlisting}
+
+\textbf{Erwartet:}
+\begin{lstlisting}[language=XML, caption={getUserStatus - Nutzer nicht gefunden}]
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+  <SOAP-ENV:Header/>
+  <SOAP-ENV:Body>
+    <ns3:userStatusReturnType xmlns:ns3="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+      <returnCode>USER_NOT_FOUND</returnCode>
+      <errorMessage>User status not found for idpUserId=999</errorMessage>
+    </ns3:userStatusReturnType>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+\end{lstlisting}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\textbf{Test-ID: 16}
+
+\textbf{Beschreibung:} \\
+\texttt{getUserStatus} - Keine IDP-Nummer übergeben (leeres Feld).
+
+\textbf{Input:}
+\begin{lstlisting}[language=XML, caption={getUserStatus-Anfrage - Leere IDP-Nummer}]
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <user:getUserStatusType>
+      <idpUserId></idpUserId>
+      <requestId>1</requestId>
+      <requestTime>2024-12-01T00:00:00Z</requestTime>
+    </user:getUserStatusType>
+  </soapenv:Body>
+</soapenv:Envelope>
+\end{lstlisting}
+
+\textbf{Erwartet:}
+\begin{lstlisting}[language=XML, caption={getUserStatus - Keine IDP-Nummer übergeben}]
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+  <SOAP-ENV:Header/>
+  <SOAP-ENV:Body>
+    <ns3:userStatusReturnType xmlns:ns3="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+      <returnCode>USER_NOT_FOUND</returnCode>
+      <errorMessage>User status not found for idpUserId=</errorMessage>
+    </ns3:userStatusReturnType>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+\end{lstlisting}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Sonstige Tests

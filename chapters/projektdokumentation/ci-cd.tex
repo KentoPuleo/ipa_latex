@@ -1,0 +1,180 @@
+\section{Implementierung der CI/CD Pipeline}
+
+\subsection{Erweiterung der CI/CD-Pipeline zur Ausführung automatisierter API-Tests}
+
+Zur Sicherstellung der Funktionsfähigkeit des gesamten Systems wurden automatisierte API-Tests mithilfe von Playwright in die bestehende \texttt{GitHub Actions}-Pipeline integriert. Ziel ist es, die korrekte Verarbeitung von SOAP-Anfragen wie \texttt{addUser}, \texttt{updateUser}, \texttt{deleteUser} und \texttt{getUserStatus} automatisiert zu prüfen.
+
+\paragraph{Initialisierungsskript}
+
+Um in der Pipeline eine konsistente Testumgebung sicherzustellen, wurde ein separates Initialisierungsskript \texttt{init-ldap.sh} erstellt. Dieses Skript stellt sicher, dass der OpenLDAP-Container vollständig gestartet ist und initialisiert anschließend die Datenbank mit einer vordefinierten Struktur sowie Testdaten. Dazu gehören die benutzerdefinierte Schema-Datei, die organisatorische Struktur, Gruppen und Beispielbenutzer.
+
+\begin{lstlisting}[language=bash, caption={Von ChatGPT generiertes Initialisierungsskript für LDAP-Daten in der CI/CD-Pipeline}]
+#!/bin/bash
+
+set -e
+set -o pipefail
+
+echo ">>> Waiting for OpenLDAP container to be ready..."
+
+timeout=30
+elapsed=0
+
+until docker exec openldap ldapsearch -Y EXTERNAL -H ldapi:/// -b "" -s base "(objectclass=*)" > /dev/null 2>&1; do
+  sleep 1
+  elapsed=$((elapsed+1))
+  if [ "$elapsed" -ge "$timeout" ]; then
+    echo " OpenLDAP did not become ready within ${timeout} seconds."
+    exit 1
+  fi
+done
+
+echo "OpenLDAP is ready."
+
+docker exec openldap ls -la /container/service/slapd/assets
+docker exec openldap ldapadd -Y EXTERNAL -H ldapi:/// -f /container/service/slapd/assets/schema.ldif
+docker exec openldap ldapadd -Y EXTERNAL -H ldapi:/// -f /container/service/slapd/assets/01_ou_structure.ldif
+docker exec openldap ldapadd -Y EXTERNAL -H ldapi:/// -f /container/service/slapd/assets/02_groups.ldif
+docker exec openldap ldapadd -Y EXTERNAL -H ldapi:/// -f /container/service/slapd/assets/03_users.ldif
+
+echo " LDAP setup completed successfully."
+\end{lstlisting}
+
+\paragraph{Erklärung der Pipeline-Schritte}
+
+Der neue Pipeline-Job \texttt{api-tests} wird nach dem erfolgreichen Build gestartet. Die einzelnen Schritte werden im Folgenden erläutert:
+
+\begin{enumerate}
+    \item \textbf{Code Checkout:} Der Quellcode des Projekts wird aus dem Repository geladen.
+    \item \textbf{Debug-Ausgabe (optional):} Ausgabe des aktuellen Verzeichnisinhalts zur Fehlersuche, z.\,B. falls Pfade nicht stimmen.
+    \item \textbf{Docker Compose Installation:} Da GitHub Actions kein Docker Compose vorinstalliert hat, wird dieses Werkzeug manuell installiert. Es wird später für das Starten von Applikation und LDAP verwendet.
+    \item \textbf{Node.js Setup:} Die für Playwright benötigte Node.js-Version (hier: Version 20) wird bereitgestellt.
+    \item \textbf{Installation der JavaScript-Abhängigkeiten:} Mit \texttt{npm ci} werden alle im Projekt definierten JavaScript-Module installiert, die für die Ausführung der Tests benötigt werden.
+    \item \textbf{JDK Setup:} Da die Applikation in Java entwickelt ist, wird das Java Development Kit in Version 17 eingerichtet.
+    \item \textbf{Build der Applikation:} Das Projekt wird mit \texttt{mvnw clean install} gebaut. Die Tests werden hierbei übersprungen, da sie separat mit Playwright abgedeckt werden.
+    \item \textbf{Start der benötigten Container:} Die Applikation sowie der LDAP-Server werden mittels \texttt{docker-compose up -d} gestartet.
+    \item \textbf{Verfügbarkeit prüfen:} Es wird mit einem einfachen \texttt{curl}-Befehl regelmäßig geprüft, ob die Applikation über ihren Heartbeat-Endpunkt erreichbar ist.
+    \item \textbf{LDAP mit Testdaten befüllen:} Das oben beschriebene Initialisierungsskript wird ausgeführt, um das LDAP-System für die Tests vorzubereiten.
+    \item \textbf{Ausführen der Playwright-Tests:} Die eigentlichen API-Tests werden mit dem Befehl \texttt{npm run test:api} ausgeführt.
+    \item \textbf{Aufräumen:} Unabhängig vom Testergebnis werden alle gestarteten Container am Ende wieder heruntergefahren.
+\end{enumerate}
+
+\begin{lstlisting}[language=yaml, caption={GitHub Actions Job zur Ausführung der API-Tests}]
+api-tests:
+  needs: build
+  runs-on: ubuntu-latest
+  steps:
+    - name: Check out code
+      uses: actions/checkout@v4
+
+    - name: Show current directory structure (debug)
+      run: |
+        pwd
+        ls -l
+
+    - name: Install Docker Compose
+      run: |
+        sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+        sudo chmod +x /usr/local/bin/docker-compose
+        docker-compose version
+
+    - name: Set up Node.js for Playwright
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Install Node.js dependencies
+      run: npm ci
+      working-directory: ${{ github.workspace }}
+
+    - name: Set up JDK
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Build project
+      run: chmod +x ./mvnw && ./mvnw clean install -DskipTests
+      working-directory: ${{ github.workspace }}
+
+    - name: Start Docker services
+      run: docker-compose up -d
+      working-directory: ${{ github.workspace }}
+
+    - name: Wait for app and LDAP to be ready
+      run: |
+        until curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/api/heartbeat | grep -q "200"; do
+          echo "Waiting for app and LDAP to be ready..."
+          sleep 2
+        done
+        echo "App and LDAP are ready!"
+
+    - name: Initialize LDAP with test data
+      run: bash ./scripts/init-ldap.sh
+      working-directory: ${{ github.workspace }}
+
+    - name: Run Playwright API tests
+      run: npm run test:api
+      working-directory: ${{ github.workspace }}
+
+    - name: Shutdown and cleanup
+      if: always()
+      run: docker-compose down -v
+      working-directory: ${{ github.workspace }}
+\end{lstlisting}
+
+
+\subsubsection{Problem während der Entwicklung: Synchronisationsfehler zwischen Applikation und LDAP}
+
+Während der Entwicklung kam es wiederholt zu einem Problem in der CI/CD-Pipeline: Die automatisierten Tests wurden bereits gestartet, bevor die Applikation vollständig hochgefahren war oder bevor eine stabile Verbindung zwischen Applikation und dem OpenLDAP-Container bestand. Dies führte zu instabilen Testergebnissen oder Verbindungsfehlern.
+
+\paragraph{Lösung: Heartbeat-Endpoint mit LDAP-Prüfung}
+
+Zur Lösung dieses Problems wurde ein dedizierter HTTP-Endpunkt \texttt{/api/heartbeat} in der Applikation implementiert. Dieser überprüft nicht nur, ob der Webserver läuft, sondern stellt explizit sicher, dass auch eine Verbindung zum LDAP-Server erfolgreich aufgebaut werden kann. Erst wenn diese Prüfung erfolgreich ist, startet die Pipeline mit den automatisierten Tests.
+
+Die Implementierung verwendet den \texttt{LdapTemplate} von Spring, um eine einfache LDAP-Suchanfrage durchzuführen. Bei Erfolg antwortet der Endpunkt mit \texttt{HTTP 200 OK}, andernfalls mit \texttt{503 Service Unavailable}.
+
+\begin{lstlisting}[language=Java, caption={HeartbeatController zur Verfügbarkeitsprüfung von Applikation und LDAP}]
+package ch.pax.ecohub.endpoints;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.ldap.core.AttributesMapper;
+import org.springframework.ldap.core.LdapTemplate;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequiredArgsConstructor
+public class HeartbeatController {
+
+    private final LdapTemplate ldapTemplate;
+
+    @GetMapping("/api/heartbeat")
+    public ResponseEntity<String> getHeartbeat() {
+        try {
+            ldapTemplate.search(
+                "",
+                "(objectClass=*)",
+                (AttributesMapper<Object>) attributes -> null
+            );
+            return ResponseEntity.ok("OK");
+        } catch (Exception e) {
+            return ResponseEntity.status(503).body("LDAP not reachable: " + e.getMessage());
+        }
+    }
+}
+\end{lstlisting}
+
+\paragraph{Verwendung in der Pipeline}
+
+In der \texttt{pipeline.yml} wurde ein Warte-Mechanismus eingebaut, der in regelmäßigen Abständen die Erreichbarkeit dieses Heartbeat-Endpunkts prüft. Erst wenn eine gültige \texttt{HTTP 200}-Antwort empfangen wird, wird mit der Initialisierung des LDAP und dem Ausführen der Tests fortgefahren. Dadurch wird sichergestellt, dass die Tests nur unter stabilen Bedingungen starten.
+
+\begin{lstlisting}[language=yaml, caption={Warten auf Heartbeat-Endpunkt in der Pipeline}]
+- name: Wait for app and LDAP to be ready
+  run: |
+    until curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/api/heartbeat | grep -q "200"; do
+      echo "Waiting for app and LDAP to be ready..."
+      sleep 2
+    done
+    echo "App and LDAP are ready!"
+\end{lstlisting}

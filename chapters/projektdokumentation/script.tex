@@ -1,0 +1,124 @@
+
+\subsection{Automatisiertes Zurücksetzen der LDAP-Testumgebung}
+
+Da durch die Ausführung der Testfälle Benutzer im LDAP-System angelegt, aktualisiert oder gelöscht werden, musste nach jedem Testlauf ein definierter Ausgangszustand wiederhergestellt werden. Um diesen Prozess zu vereinfachen, wurde ein Bash-Skript entwickelt, welches die Testumgebung automatisiert neu aufsetzt.
+
+\subsubsection*{Zielsetzung}
+
+Das Skript stellt sicher, dass:
+
+\begin{itemize}
+  \item der OpenLDAP-Container neu gestartet wird,
+  \item alle relevanten LDIF-Dateien neu importiert werden (Schema, Struktur, Gruppen, Benutzer),
+  \item eine konsistente Ausgangsbasis für jeden Testlauf garantiert ist.
+\end{itemize}
+
+
+\subsection{Automatisiertes Zurücksetzen der LDAP-Testumgebung}
+
+Da durch die Ausführung der Testfälle Benutzer im LDAP-System angelegt, aktualisiert oder gelöscht werden, musste nach jedem Testlauf ein definierter Ausgangszustand wiederhergestellt werden. Um diesen Prozess zu vereinfachen, wurde ein Bash-Skript verwendet, das die Testumgebung automatisiert neu aufsetzt.
+
+\subsubsection*{Herkunft und Motivation}
+
+Das Skript wurde mit Hilfe von \textbf{ChatGPT (OpenAI)} generiert und anschließend in das Projekt übernommen. Es basiert funktional auf den Anweisungen im \texttt{README.md} der Entwicklungsumgebung, in dem ursprünglich alle Schritte manuell beschrieben waren - wie z.\,B. das Stoppen und Starten der Container sowie der Import von Schema- und Beispieldaten. Ziel war es, diese manuellen Kommandos in ein einziges, robustes Skript zu überführen.
+
+\subsubsection*{Zielsetzung}
+
+Das Skript stellt sicher, dass:
+
+\begin{itemize}
+  \item der OpenLDAP-Container vollständig neu gestartet wird,
+  \item die im Projekt enthaltenen LDIF-Dateien korrekt geladen werden (\texttt{schema.ldif}, \texttt{01\_ou\_structure.ldif}, \texttt{02\_groups.ldif}, \texttt{03\_users.ldif}),
+  \item eine konsistente und saubere Ausgangsbasis für jeden Testlauf gegeben ist.
+\end{itemize}
+
+\subsubsection*{Skriptübersicht}
+
+\begin{lstlisting}[language=bash, caption={Von ChatGPT generiertes Skript - Automatisierung der README-Kommandos}]
+#!/bin/bash
+
+set -e
+set -o pipefail
+
+# Git Bash Workaround
+export MSYS_NO_PATHCONV=1
+
+echo ">>> Stopping and removing containers and volumes..."
+docker compose down -v
+
+echo ">>> Starting containers..."
+docker compose up -d
+
+echo ">>> Waiting for OpenLDAP container to be ready..."
+sleep 5
+
+# Check container
+if ! docker ps --format '{{.Names}}' | grep -q '^openldap$'; then
+  echo " Error: OpenLDAP container 'openldap' not running."
+  exit 1
+fi
+
+# Validate LDIF files
+docker exec openldap ls -la /container/service/slapd/assets
+
+# Import LDIF files
+winpty docker exec openldap sh -c "ldapadd -Y EXTERNAL -H ldapi:/// -f /container/service/slapd/assets/schema.ldif"
+winpty docker exec openldap sh -c "ldapadd -Y EXTERNAL -H ldapi:/// -f /container/service/slapd/assets/01_ou_structure.ldif"
+winpty docker exec openldap sh -c "ldapadd -Y EXTERNAL -H ldapi:/// -f /container/service/slapd/assets/02_groups.ldif"
+winpty docker exec openldap sh -c "ldapadd -Y EXTERNAL -H ldapi:/// -f /container/service/slapd/assets/03_users.ldif"
+
+echo " LDAP setup completed successfully."
+\end{lstlisting}
+
+\subsubsection*{Nutzen}
+
+Durch die Verwendung dieses Skripts konnte eine stabile, wiederholbare und leicht startbare LDAP-Testumgebung geschaffen werden. Es diente während der gesamten Testphase zur Vorbereitung der Tests und ermöglichte die zuverlässige Rücksetzung des Systemzustands nach jeder Testausführung.
+
+
+\subsubsection*{Beispielinhalte der LDIF-Dateien}
+
+Die LDIF-Dateien enthalten die für die Tests notwendige LDAP-Struktur, Gruppen und Testbenutzer. Im Folgenden sind exemplarische Auszüge aus den jeweiligen Dateien dargestellt.
+
+\paragraph{Strukturdefinition - \texttt{01\_ou\_structure.ldif}}
+
+Diese Datei definiert die grundlegenden Organisationseinheiten innerhalb des LDAP-Verzeichnisses, z.\,B. für Benutzer oder Gruppen:
+
+\begin{lstlisting}[language=bash, caption={Auszug aus \texttt{01\_ou\_structure.ldif}}]
+dn: ou=people,dc=paxportal,dc=ch
+objectClass: organizationalUnit
+ou: people
+
+dn: ou=groups,dc=paxportal,dc=ch
+objectClass: organizationalUnit
+ou: groups
+\end{lstlisting}
+
+\paragraph{Gruppendefinition - \texttt{02\_groups.ldif}}
+
+Diese Datei legt LDAP-Gruppen an, denen Benutzer später zugewiesen werden:
+
+\begin{lstlisting}[language=bash, caption={Auszug aus \texttt{02\_groups.ldif}}]
+dn: cn=BROKERPORTAL,ou=groups,dc=paxportal,dc=ch
+objectClass: groupOfNames
+cn: BROKERPORTAL
+member: cn=placeholder,dc=paxportal,dc=ch
+\end{lstlisting}
+
+\paragraph{Testbenutzer - \texttt{03\_users.ldif}}
+
+Diese Datei enthält vorab definierte Testnutzer, die für Integrationstests verwendet werden:
+
+\begin{lstlisting}[language=bash, caption={Auszug aus \texttt{03\_users.ldif}}]
+dn: cn=Marco Frei,ou=people,dc=paxportal,dc=ch
+objectClass: inetOrgPerson
+objectClass: paxPeople
+cn: Marco Frei
+sn: Frei
+givenName: Marco
+mail: marco.frei@pax.ch
+uid: 100
+\end{lstlisting}
+
+\subsubsection*{Zusammenfassung}
+
+Durch die Kombination aus Container-Neustart und gezieltem Import der LDIF-Dateien wird die Testumgebung für jede Ausführung in einen sauberen Ausgangszustand zurückgesetzt. Die Strukturdateien sind modular aufgebaut und ermöglichen eine klare Trennung zwischen OUs, Gruppen und Benutzern.

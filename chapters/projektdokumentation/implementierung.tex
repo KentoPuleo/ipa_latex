@@ -9,10 +9,62 @@ Im zweiten Abschnitt wird die Testautomation behandelt. Es wird erklärt, wie di
 
 \input{chapters/projektdokumentation/mappingfunktion.tex}
 
-\section{Testautomation}
-Beschreibung der Testautomation. 
+\input{chapters/projektdokumentation/tests.tex}
 
+\input{chapters/projektdokumentation/script.tex}
 
+\clearpage
+\subsection{Verfügbarkeit der Applikation prüfen – \texttt{globalSetup.ts}}
 
+Bevor die automatisierten Tests gestartet werden, muss sichergestellt sein, dass die zu testende Applikation tatsächlich läuft und erreichbar ist. Dafür wurde ein \texttt{globalSetup}-Script implementiert, das vor jedem Testlauf von Playwright automatisch ausgeführt wird.
 
- 
+\subsubsection*{Ziel}
+
+Das Skript validiert, ob die SOAP-Schnittstelle unter \texttt{http://localhost:8080/ws} erreichbar ist. Sollte dies nicht der Fall sein, wird der Testlauf mit einem entsprechenden Fehler beendet.
+
+\subsubsection*{Implementierung}
+
+\begin{lstlisting}[language=TypeScript, caption={globalSetup.ts – Prüfung der Erreichbarkeit der API}]
+import { request } from '@playwright/test';
+import { createGetUserStatusXML } from './services/createXmlService';
+
+export default async function globalSetup() {
+  const checkPayload = createGetUserStatusXML({
+    idpUserId: '000',
+    requestId: '1',
+    requestTime: '2024-12-01T00:00:00Z',
+  });
+
+  const context = await request.newContext();
+  try {
+    const res = await context.post('http://localhost:8080/ws', {
+      headers: { 'Content-Type': 'text/xml;charset=UTF-8' },
+      data: checkPayload,
+    });
+
+    if (res.status() >= 500) {
+      throw new Error('API antwortet, aber mit Serverfehler.');
+    }
+  } catch (err) {
+    console.error(' Service nicht erreichbar: localhost:8080');
+    process.exit(1);
+  }
+}
+\end{lstlisting}
+
+\subsubsection*{Einbindung in die Testkonfiguration}
+
+Das Skript wurde in der Playwright-Konfigurationsdatei \texttt{playwright.config.ts} eingebunden und wird automatisch vor jedem Testlauf ausgeführt:
+
+\begin{lstlisting}[language=TypeScript, caption={Ausschnitt aus \texttt{playwright.config.ts}}]
+export default defineConfig({
+  globalSetup: './api-tests/globalSetup.ts',
+  ...
+});
+\end{lstlisting}
+
+\subsubsection*{Nutzen}
+
+Durch diese Prüfung kann frühzeitig festgestellt werden, ob die Applikation betriebsbereit ist. Das spart Zeit und vermeidet fehlschlagende Tests durch technische Ursachen wie vergessene Containerstarts oder Portprobleme. Bei Nichterreichbarkeit wird die Testausführung mit einem klaren Fehlerbild abgebrochen.
+
+\input{chapters/projektdokumentation/ci-cd.tex}

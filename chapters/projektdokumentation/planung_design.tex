@@ -254,7 +254,7 @@ In diesem Abschnitt werden die im Projekt eingesetzten Tools und Technologien be
 
 Die im Rahmen der \texttt{updateUser}-Funktion implementierte rollenbasierte Mapping-Funktion kann nicht vollständig durch automatisierte API-Tests abgedeckt werden. Um diese dennoch zuverlässig zu testen, wird ein manueller Testansatz verfolgt.
 
-Hierzu wird die Anwendung lokal gestartet und mit Hilfe von \textbf{SoapUI} gezielt über den \texttt{updateUser}-SOAP-Endpunkt angesprochen. Gleichzeitig wird ein \textbf{OpenLDAP}-Container lokal ausgeführt, welcher als Testverzeichnisdienst dient. So kann überprüft werden, ob Benutzer – basierend auf übermittelten Rollen – korrekt den entsprechenden Gruppen im LDAP hinzugefügt werden.
+Hierzu wird die Anwendung lokal gestartet und mit Hilfe von \textbf{SoapUI} gezielt über den \texttt{updateUser}-SOAP-Endpunkt angesprochen. Gleichzeitig wird ein \textbf{OpenLDAP}-Container lokal ausgeführt, welcher als Testverzeichnisdienst dient. So kann überprüft werden, ob Benutzer - basierend auf übermittelten Rollen - korrekt den entsprechenden Gruppen im LDAP hinzugefügt werden.
 
 SoapUI ermöglicht das flexible Erstellen und Anpassen von SOAP-Anfragen, wodurch verschiedene Rollenkonstellationen getestet werden können. Durch anschliessende Kontrolle der Einträge im LDAP (z.\,B. mit \texttt{ldapsearch}) lässt sich die Funktionsweise der Mapping-Logik gezielt überprüfen.
 

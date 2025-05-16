@@ -1,0 +1,559 @@
+\section{Implementierung der Tests}
+
+\subsection{Einrichtung und Konfiguration des Testframeworks}
+
+Für die automatisierte Überprüfung der SOAP-Schnittstellen wurde das Framework \textbf{Playwright} verwendet. Obwohl Playwright primär für End-to-End-Tests von Webanwendungen konzipiert ist, eignet es sich auch hervorragend für API-Tests. Besonders hervorzuheben sind die einfache Handhabung, moderne Syntax sowie eine integrierte Testumgebung.
+
+Im ersten Schritt wurde Playwright lokal ins Projekt integriert:
+
+\begin{lstlisting}[language=bash, caption={Installation von Playwright}]
+npm install -D @playwright/test
+npx playwright install
+\end{lstlisting}
+
+Nach der Installation wurde eine geeignete Projektstruktur für die Testautomation aufgebaut:
+
+\begin{itemize}
+  \item \texttt{api-tests/} - Hauptverzeichnis für die Playwright-Testfälle.
+  \item \texttt{addUser.spec.ts} - Test für den \texttt{addUser}-Endpunkt.
+  \item \texttt{updateUser.spec.ts} - Test für den \texttt{updateUser}-Endpunkt.
+  \item \texttt{deleteUser.spec.ts} - Test für den \texttt{deleteUser}-Endpunkt.
+  \item \texttt{getUserStatus.spec.ts} - Test für den \texttt{getUserStatus}-Endpunkt.
+\end{itemize}
+
+Diese Struktur ermöglicht es, die Testfälle übersichtlich zu organisieren und flexibel auf unterschiedliche Testanforderungen einzugehen.
+
+\subsection{Generierung der SOAP-Requests}
+
+Zur Erzeugung valider und ungültiger SOAP-Anfragen wurde im Verzeichnis \texttt{api-tests/services} ein separater Service namens \texttt{createXmlService.ts} implementiert. Dieser stellt Funktionen bereit, die dynamisch XML-Anfragen für alle unterstützten Endpunkte erzeugen.
+
+Die generierten XMLs basieren auf dem offiziellen Schema der Schnittstelle (\texttt{userProvisioningSchemaTypes-v3.0}) und können mit konkreten Nutzerdaten befüllt werden. Dadurch wird sichergestellt, dass die Tests sowohl syntaktisch korrekte als auch gezielt fehlerhafte Payloads erzeugen können.
+
+Der Service umfasst folgende Funktionen:
+
+\begin{itemize}
+  \item \texttt{createAddUserXML(\{\dots\})} - erzeugt eine gültige \texttt{addUser}-Anfrage
+  \item \texttt{createUpdateUserXML(\{\dots\})} - erzeugt eine gültige \texttt{updateUser}-Anfrage
+  \item \texttt{createDeleteUserXML(\{\dots\})} - erzeugt eine gültige \texttt{deleteUser}-Anfrage
+  \item \texttt{createGetUserStatusXML(\{\dots\})} - erzeugt eine gültige \texttt{getUserStatus}-Anfrage
+  \item sowie entsprechende Varianten mit absichtlich ungültigen Nutzerdaten
+\end{itemize}
+
+Durch diese Trennung von Testlogik und Payload-Erstellung wird der Code wartbar gehalten und Wiederverwendbarkeit gefördert.
+
+\subsubsection{Beispiel: Generierung einer \texttt{deleteUser}-SOAP-Anfrage}
+
+Nachfolgend ist die Funktion \texttt{createDeleteUserXML} dargestellt, die ein vollständiges SOAP-Request für den \texttt{deleteUser}-Endpunkt erzeugt. Sie wird in den Tests genutzt, um dynamisch Anfragen mit beliebigen Testdaten zu erstellen:
+
+\begin{lstlisting}[language=TypeScript, caption={Funktion zur Generierung einer \texttt{deleteUser}-SOAP-Anfrage}]
+export function createDeleteUserXML(data: {
+    idpUserId: string;
+    deletionDate: string;
+    deletionUser: string;
+    requestId: string;
+    requestTime: string;
+}): string {
+    return `
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <user:deleteUserType xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+      <idpUserId>${data.idpUserId}</idpUserId>
+      <deletionDate>${data.deletionDate}</deletionDate>
+      <deletionUser>${data.deletionUser}</deletionUser>
+      <requestId>${data.requestId}</requestId>
+      <requestTime>${data.requestTime}</requestTime>
+    </user:deleteUserType>
+  </soapenv:Body>
+</soapenv:Envelope>
+`.trim();
+}
+\end{lstlisting}
+
+Diese Funktion kann z.\,B. wie folgt aufgerufen werden:
+
+\begin{lstlisting}[language=TypeScript, caption={Beispielhafte Nutzung in einem Test}]
+const xml = createDeleteUserXML({
+    idpUserId: '123456',
+    deletionDate: '2025-05-16',
+    deletionUser: 'testuser',
+    requestId: 'REQ-001',
+    requestTime: '2025-05-16T10:00:00Z'
+});
+\end{lstlisting}
+
+
+\subsection{Test: \texttt{addUser}}
+
+Die folgenden Playwright-Tests überprüfen den SOAP-Endpunkt \texttt{addUser}, mit dem neue Benutzer in das System aufgenommen werden. Es werden dabei verschiedene Situationen getestet: von einem erfolgreichen Hinzufügen bis hin zu Fehlerfällen bei ungültigem oder unvollständigem Input.
+
+\subsubsection*{Testfall TC1 - Erfolgreiches Hinzufügen eines Nutzers}
+
+\begin{lstlisting}[language=TypeScript, caption={TC1: Nutzer wird erfolgreich hinzugefügt}]
+test('TC1: addUser - IDP Nummer erfolgreich vergeben', async ({ request }) => {
+  const xml = createUserXML({
+    ...basePayload,
+    idpUserId: '100',
+    userEmail: 'marco.frei@pax.ch',
+    givenName: 'Marco',
+    surname: 'Frei',
+  });
+
+  const response = await request.post(endpoint, {
+    headers: { 'Content-Type': 'text/xml;charset=UTF-8' },
+    data: xml,
+  });
+
+  const body = await response.text();
+  expect(response.ok()).toBeTruthy();
+  expect(body).toContain('<returnCode>OK</returnCode>');
+});
+\end{lstlisting}
+
+\textbf{Erklärung:} Hier wird ein vollständiger und korrekter SOAP-Request erstellt. Die Antwort des Servers enthält den Code \texttt{OK}, was bestätigt, dass der Benutzer erfolgreich hinzugefügt wurde.
+
+\subsubsection*{Testfall TC2 - Benutzer existiert bereits}
+
+\begin{lstlisting}[language=TypeScript, caption={TC2: IDP Nummer ist bereits vergeben}]
+test('TC2: addUser - IDP Nummer bereits vergeben', async ({ request }) => {
+  const xml = createUserXML({
+    ...basePayload,
+    idpUserId: '101',
+    userEmail: 'max.mustermann@pax.ch',
+    givenName: 'Max',
+    surname: 'Mustermann',
+  });
+
+  const response = await request.post(endpoint, {
+    headers: { 'Content-Type': 'text/xml;charset=UTF-8' },
+    data: xml,
+  });
+
+  const body = await response.text();
+  expect(body).toContain('<returnCode>USER_EXISTS</returnCode>');
+  expect(body).toContain('User already exists with idpUserId=101');
+});
+\end{lstlisting}
+
+\textbf{Erklärung:} In diesem Fall wird ein Benutzer mit einer bereits vergebenen IDP-Nummer hinzugefügt. Der Server erkennt dies und gibt eine entsprechende Fehlermeldung zurück.
+
+\subsubsection*{Testfall TC3 - Unvollständige Nutzerdaten}
+
+\begin{lstlisting}[language=TypeScript, caption={TC3: Nachname fehlt im Payload}]
+test('TC3: addUser - unvollständiger Payload', async ({ request }) => {
+  const partialPayload = { ...basePayload };
+  delete (partialPayload as any).surname;
+
+  const xml = createInvalidUserXML({
+    ...partialPayload,
+    idpUserId: '103',
+    userEmail: 'marco.frei@pax.ch',
+    givenName: 'Marco',
+  });
+
+  const response = await request.post(endpoint, {
+    headers: { 'Content-Type': 'text/xml;charset=UTF-8' },
+    data: xml,
+  });
+
+  const body = await response.text();
+  expect(body).toContain('<returnCode>ERROR</returnCode>');
+  expect(body).toContain('Payload validation failed for idpUserId=103');
+});
+\end{lstlisting}
+
+\textbf{Erklärung:} Hier wird der Nachname bewusst weggelassen. Die Anwendung reagiert mit einem \texttt{ERROR}-Code und gibt einen validierungsspezifischen Fehlertext zurück.
+
+\subsubsection*{Testfall TC4 - Fehlerhafte E-Mail-Adresse}
+
+\begin{lstlisting}[language=TypeScript, caption={TC4: Technische Prüfung schlägt fehl}]
+test('TC4: addUser - nicht existierende Email-Adresse', async ({ request }) => {
+  const xml = createUserXML({
+    ...basePayload,
+    idpUserId: '104',
+    userEmail: 'marco.frei1@bug.ch',
+    givenName: 'Marco',
+    surname: 'Frei',
+  });
+
+  const response = await request.post(endpoint, {
+    headers: { 'Content-Type': 'text/xml;charset=UTF-8' },
+    data: xml,
+  });
+
+  const body = await response.text();
+  expect(body).toContain('<returnCode>ERROR</returnCode>');
+  expect(body).toContain('Processing add user failed for idpUserId=104');
+});
+\end{lstlisting}
+
+\textbf{Erklärung:} Obwohl der Payload technisch vollständig ist, wird eine nicht zugelassene oder nicht konfigurierte E-Mail-Adresse verwendet. Die Applikation meldet einen internen Fehler beim Hinzufügen des Nutzers.
+
+\subsubsection*{Testfall TC5 - Leere Eingabewerte}
+
+\begin{lstlisting}[language=TypeScript, caption={TC5: Leere Pflichtfelder}]
+test('TC5: addUser - no value', async ({ request }) => {
+  const xml = createUserXML({
+    ...basePayload,
+    idpUserId: '',
+    userEmail: "",
+    givenName: '',
+    surname: '',
+  });
+
+  const response = await request.post(endpoint, {
+    headers: { 'Content-Type': 'text/xml;charset=UTF-8' },
+    data: xml,
+  });
+
+  const body = await response.text();
+  expect(body).toContain('<returnCode>ERROR</returnCode>');
+  expect(body).toContain('Processing add user failed for idpUserId=');
+});
+\end{lstlisting}
+
+\textbf{Erklärung:} Dieser Fall testet, wie das System auf komplett leere Felder reagiert. Erwartet wird eine Fehlermeldung, dass der Nutzer nicht verarbeitet werden konnte.
+
+\subsubsection*{Fazit}
+
+Durch die fünf Testfälle wird die gesamte Bandbreite des \texttt{addUser}-Endpunkts abgedeckt. Die Tests prüfen sowohl positive Szenarien als auch typische Fehlerfälle bei der Eingabe. Dadurch ist sichergestellt, dass die Schnittstelle robust und fehlerresistent ist.
+
+\subsubsection*{Testfallübersicht}
+
+Insgesamt wurden fünf Testfälle implementiert, darunter:
+
+\begin{itemize}
+  \item \textbf{TC1} - Erfolgreiches Hinzufügen eines Nutzers mit vollständigen und gültigen Daten
+  \item \textbf{TC2} - Fehler bei fehlendem Pflichtfeld \texttt{surname}
+  \item \textbf{TC3} - Fehler bei falschem Format der E-Mail-Adresse
+  \item \textbf{TC4} - Fehlerhafte IDP-Nummer (z.B. Buchstaben statt Zahlen)
+  \item \textbf{TC5} - Leerer SOAP-Body (technischer Fehlerfall)
+\end{itemize}
+
+Die Tests wurden so gestaltet, dass sie die Robustheit und Fehlertoleranz der Schnittstelle systematisch prüfen.
+
+
+\clearpage
+\subsection{Test: \texttt{updateUser}}
+
+Die folgenden Playwright-Tests überprüfen den SOAP-Endpunkt \texttt{updateUser}, mit dem bestehende Benutzer aktualisiert werden. Es werden verschiedene Szenarien abgedeckt - vom erfolgreichen Update bis hin zu typischen Fehlerfällen wie ungültige Eingaben oder unbekannte Nutzer.
+
+\subsubsection*{Testfall TC6 - Erfolgreiches Aktualisieren eines Nutzers}
+
+\begin{lstlisting}[language=TypeScript, caption={TC6: Nutzer wird erfolgreich aktualisiert}]
+test('TC6: updateUser - IDP Nummer erfolgreich aktualisiert', async ({ request }) => {
+  const xml = createUserXML({
+    ...basePayload,
+    idpUserId: '200',
+    userEmail: 'laura.schmidt@pax.ch',
+    givenName: 'Laura',
+    surname: 'Schmidt',
+  });
+
+  const response = await request.post(endpoint, {
+    headers: { 'Content-Type': 'text/xml;charset=UTF-8' },
+    data: xml,
+  });
+
+  const body = await response.text();
+  expect(body).toContain('<returnCode>OK</returnCode>');
+});
+\end{lstlisting}
+
+\textbf{Erklärung:} In diesem Test wird ein bereits vorhandener Benutzer erfolgreich aktualisiert. Die Rückmeldung vom Server enthält den Code \texttt{OK}.
+
+\subsubsection*{Testfall TC7 - Nutzer nicht gefunden}
+
+\begin{lstlisting}[language=TypeScript, caption={TC7: Benutzer mit IDP Nummer existiert nicht}]
+test('TC7: updateUser - Nutzer nicht gefunden', async ({ request }) => {
+  const xml = createUserXML({
+    ...basePayload,
+    idpUserId: '201',
+    userEmail: 'heidi.meier1@bug.ch',
+    givenName: 'Heidi',
+    surname: 'Meier',
+  });
+
+  const response = await request.post(endpoint, {
+    headers: { 'Content-Type': 'text/xml;charset=UTF-8' },
+    data: xml,
+  });
+
+  const body = await response.text();
+  expect(body).toContain('<returnCode>USER_NOT_FOUND</returnCode>');
+  expect(body).toContain('User cannot update for idpUserId=201');
+});
+\end{lstlisting}
+
+\textbf{Erklärung:} Der Test simuliert einen Update-Versuch für eine IDP-Nummer, die im System nicht vorhanden ist. Die Antwort weist den Fehlercode \texttt{USER\_NOT\_FOUND} aus.
+
+\subsubsection*{Testfall TC8 - Unvollständige Nutzerdaten}
+
+\begin{lstlisting}[language=TypeScript, caption={TC8: Nachname fehlt im Payload}]
+test('TC8: updateUser - unvollständiger Payload', async ({ request }) => {
+  const partialPayload = { ...basePayload };
+  delete (partialPayload as any).surname;
+
+  const xml = createInvalidUserXML({
+    ...partialPayload,
+    idpUserId: '111',
+    userEmail: 'marco.frei@pax.ch',
+    givenName: 'Marco',
+  });
+
+  const response = await request.post(endpoint, {
+    headers: { 'Content-Type': 'text/xml;charset=UTF-8' },
+    data: xml,
+  });
+
+  const body = await response.text();
+  expect(body).toContain('<returnCode>ERROR</returnCode>');
+  expect(body).toContain('Payload validation failed for idpUserId=111');
+});
+\end{lstlisting}
+
+\textbf{Erklärung:} Es fehlt ein Pflichtfeld (Nachname), wodurch die Validierung fehlschlägt. Der Server liefert einen Fehlercode \texttt{ERROR} mit entsprechendem Hinweistext.
+
+\subsubsection*{Testfall TC9 - Leere Eingabewerte}
+
+\begin{lstlisting}[language=TypeScript, caption={TC9: Leere Pflichtfelder im Payload}]
+test('TC9: updateUser - no value', async ({ request }) => {
+  const xml = createUserXML({
+    ...basePayload,
+    idpUserId: '',
+    userEmail: "",
+    givenName: '',
+    surname: '',
+  });
+
+  const response = await request.post(endpoint, {
+    headers: { 'Content-Type': 'text/xml;charset=UTF-8' },
+    data: xml,
+  });
+
+  const body = await response.text();
+  expect(body).toContain('<returnCode>USER_NOT_FOUND</returnCode>');
+  expect(body).toContain('User cannot update for idpUserId=');
+});
+\end{lstlisting}
+
+\textbf{Erklärung:} Der Test überprüft das Verhalten bei komplett leeren Pflichtfeldern. Der Server erkennt, dass kein gültiger Benutzer identifiziert werden kann und reagiert mit dem Fehlercode \texttt{USER\_NOT\_FOUND}.
+
+\subsubsection*{Fazit}
+
+Die Tests für \texttt{updateUser} decken zentrale Anwendungsfälle und Fehlerszenarien ab. Sie zeigen, dass sowohl korrekte Updates als auch fehlerhafte Daten eindeutig und nachvollziehbar vom System verarbeitet werden.
+
+\subsubsection*{Testfallübersicht}
+
+Insgesamt wurden vier Testfälle implementiert:
+
+\begin{itemize}
+  \item \textbf{TC6} - Erfolgreiches Aktualisieren eines Nutzers
+  \item \textbf{TC7} - Nutzer mit gegebener IDP-Nummer existiert nicht
+  \item \textbf{TC8} - Pflichtfeld \texttt{surname} fehlt im Payload
+  \item \textbf{TC9} - Leere Werte führen zu fehlender Identifikation des Nutzers
+\end{itemize}
+
+Die Tests stellen sicher, dass die Update-Logik sowohl funktional als auch validierungsseitig korrekt arbeitet.
+
+
+\clearpage
+\subsection{Test: \texttt{deleteUser}}
+
+Die folgenden Playwright-Tests überprüfen den SOAP-Endpunkt \texttt{deleteUser}, mit dem Benutzer aus dem System entfernt werden. Es werden sowohl erfolgreiche Löschungen als auch typische Fehlerszenarien getestet - etwa wenn der Benutzer nicht existiert oder die Eingabe ungültig ist.
+
+\subsubsection*{Testfall TC10 - Erfolgreiches Löschen eines Nutzers}
+
+\begin{lstlisting}[language=TypeScript, caption={TC10: IDP-Nummer erfolgreich gelöscht}]
+test('TC10: deleteUser - IDP-Nummer erfolgreich gelöscht', async ({ request }) => {
+  const xml = createDeleteUserXML({
+    ...baseData,
+    idpUserId: '005',
+  });
+
+  const response = await request.post(endpoint, {
+    headers: { 'Content-Type': 'text/xml;charset=UTF-8' },
+    data: xml,
+  });
+
+  const body = await response.text();
+  expect(response.ok()).toBeTruthy();
+  expect(body).toContain('<returnCode>OK</returnCode>');
+});
+\end{lstlisting}
+
+\textbf{Erklärung:} Ein Benutzer mit der IDP-Nummer \texttt{005} wird erfolgreich gelöscht. Die Serverantwort bestätigt dies mit dem Code \texttt{OK}.
+
+\subsubsection*{Testfall TC11 - Ungültige oder zu lange IDP-Nummer}
+
+\begin{lstlisting}[language=TypeScript, caption={TC11: Ungültige IDP-Nummer im Payload}]
+test('TC11: deleteUser - Payload unvollständig oder ungültig', async ({ request }) => {
+  const xml = createDeleteUserXML({
+    ...baseData,
+    idpUserId: '11111111111111111111111',
+  });
+
+  const response = await request.post(endpoint, {
+    headers: { 'Content-Type': 'text/xml;charset=UTF-8' },
+    data: xml,
+  });
+
+  const body = await response.text();
+  expect(body).toContain('<returnCode>ERROR</returnCode>');
+  expect(body).toContain(
+    'Payload validation for delete user failed for idpUserId=1111111111111111111'
+  );
+});
+\end{lstlisting}
+
+\textbf{Erklärung:} In diesem Test ist die IDP-Nummer ungültig - sie ist zu lang oder entspricht nicht dem erwarteten Format. Der Server gibt einen Fehlercode \texttt{ERROR} zurück.
+
+\subsubsection*{Testfall TC12 - Benutzer nicht gefunden}
+
+\begin{lstlisting}[language=TypeScript, caption={TC12: Nutzer nicht vorhanden}]
+test('TC12: deleteUser - Nutzer nicht gefunden', async ({ request }) => {
+  const xml = createDeleteUserXML({
+    ...baseData,
+    idpUserId: '999',
+  });
+
+  const response = await request.post(endpoint, {
+    headers: { 'Content-Type': 'text/xml;charset=UTF-8' },
+    data: xml,
+  });
+
+  const body = await response.text();
+  expect(body).toContain('<returnCode>USER_NOT_FOUND</returnCode>');
+  expect(body).toContain('User to be deleted not found idpUserId=999');
+});
+\end{lstlisting}
+
+\textbf{Erklärung:} Der Benutzer mit der angegebenen IDP-Nummer existiert nicht. Die Anwendung reagiert mit dem spezifischen Fehlercode \texttt{USER\_NOT\_FOUND}.
+
+\subsubsection*{Testfall TC13 - Leerer Wert im Payload}
+
+\begin{lstlisting}[language=TypeScript, caption={TC13: Leerer Wert bei IDP-Nummer}]
+test('TC13: deleteUser - no value', async ({ request }) => {
+  const xml = createDeleteUserXML({
+    ...baseData,
+    idpUserId: '',
+  });
+
+  const response = await request.post(endpoint, {
+    headers: { 'Content-Type': 'text/xml;charset=UTF-8' },
+    data: xml,
+  });
+
+  const body = await response.text();
+  expect(body).toContain('<returnCode>USER_NOT_FOUND</returnCode>');
+  expect(body).toContain('User to be deleted not found idpUserId=');
+});
+\end{lstlisting}
+
+\textbf{Erklärung:} Hier wird der Löschbefehl mit einer leeren IDP-Nummer gesendet. Der Server kann keinen Nutzer identifizieren und gibt den Fehlercode \texttt{USER\_NOT\_FOUND} zurück.
+
+\subsubsection*{Fazit}
+
+Die Tests stellen sicher, dass der Endpunkt \texttt{deleteUser} korrekt funktioniert - sowohl bei gültiger als auch bei fehlerhafter Eingabe. Durch gezielte Fehlersimulationen wird überprüft, ob die API erwartungsgemäß reagiert.
+
+\subsubsection*{Testfallübersicht}
+
+Es wurden vier Testfälle für diesen Endpunkt implementiert:
+
+\begin{itemize}
+  \item \textbf{TC10} - Erfolgreiches Löschen eines Nutzers
+  \item \textbf{TC11} - Ungültige IDP-Nummer im Payload
+  \item \textbf{TC12} - Nutzer mit gegebener IDP-Nummer existiert nicht
+  \item \textbf{TC13} - Leerer Wert bei IDP-Nummer
+\end{itemize}
+
+Die Abdeckung umfasst funktionale und validierungsbezogene Anforderungen an die Schnittstelle.
+
+
+\clearpage
+\subsection{Test: \texttt{getUserStatus}}
+
+Die folgenden Playwright-Tests prüfen den SOAP-Endpunkt \texttt{getUserStatus}, der verwendet wird, um den aktuellen Status eines Benutzers anhand seiner IDP-Nummer zu ermitteln. Dabei werden sowohl erfolgreiche als auch fehlgeschlagene Abfragen getestet.
+
+\subsubsection*{Testfall TC14 - Nutzer erfolgreich gefunden}
+
+\begin{lstlisting}[language=TypeScript, caption={TC14: Nutzerstatus erfolgreich abgerufen}]
+test('TC14: getUserStatus - Nutzer erfolgreich gefunden', async ({ request }) => {
+  const xml = createGetUserStatusXML({
+    ...baseData,
+    idpUserId: '004',
+  });
+
+  const response = await request.post(endpoint, {
+    headers: { 'Content-Type': 'text/xml;charset=UTF-8' },
+    data: xml,
+  });
+
+  const body = await response.text();
+  expect(response.ok()).toBeTruthy();
+  expect(body).toContain('<returnCode>OK</returnCode>');
+  expect(body).toContain('<userStatus>OK</userStatus>');
+});
+\end{lstlisting}
+
+\textbf{Erklärung:} In diesem Test wird der Status eines existierenden Nutzers abgefragt. Der Server gibt den Rückgabecode \texttt{OK} sowie den Benutzerstatus \texttt{OK} aus.
+
+\subsubsection*{Testfall TC15 - Nutzer nicht gefunden}
+
+\begin{lstlisting}[language=TypeScript, caption={TC15: Nutzer mit IDP-Nummer existiert nicht}]
+test('TC15: getUserStatus - Nutzer nicht gefunden', async ({ request }) => {
+  const xml = createGetUserStatusXML({
+    ...baseData,
+    idpUserId: '999',
+  });
+
+  const response = await request.post(endpoint, {
+    headers: { 'Content-Type': 'text/xml;charset=UTF-8' },
+    data: xml,
+  });
+
+  const body = await response.text();
+  expect(body).toContain('<returnCode>USER_NOT_FOUND</returnCode>');
+  expect(body).toContain('User status not found for idpUserId=999');
+});
+\end{lstlisting}
+
+\textbf{Erklärung:} Dieser Testfall prüft die Reaktion auf eine Anfrage für einen nicht vorhandenen Benutzer. Der Server gibt korrekt den Fehlercode \texttt{USER\_NOT\_FOUND} zurück.
+
+\subsubsection*{Testfall TC16 - Leerer Wert im Payload}
+
+\begin{lstlisting}[language=TypeScript, caption={TC16: Leerer Wert bei IDP-Nummer}]
+test('TC16: getUserStatus - no value', async ({ request }) => {
+  const xml = createGetUserStatusXML({
+    ...baseData,
+    idpUserId: '',
+  });
+
+  const response = await request.post(endpoint, {
+    headers: { 'Content-Type': 'text/xml;charset=UTF-8' },
+    data: xml,
+  });
+
+  const body = await response.text();
+  expect(body).toContain('<returnCode>USER_NOT_FOUND</returnCode>');
+  expect(body).toContain('User status not found for idpUserId=');
+});
+\end{lstlisting}
+
+\textbf{Erklärung:} In diesem Test wird die IDP-Nummer leer gelassen. Der Server erkennt, dass keine gültige Benutzer-ID vorhanden ist, und liefert ebenfalls den Fehlercode \texttt{USER\_NOT\_FOUND} zurück.
+
+\subsubsection*{Fazit}
+
+Die Tests für den Endpunkt \texttt{getUserStatus} gewährleisten, dass sowohl erfolgreiche Statusabfragen als auch fehlerhafte Anfragen - z.\,B. bei unbekannter oder leerer IDP-Nummer - zuverlässig verarbeitet werden.
+
+\subsubsection*{Testfallübersicht}
+
+Es wurden drei Testfälle für diesen Endpunkt implementiert:
+
+\begin{itemize}
+  \item \textbf{TC14} - Erfolgreiche Statusabfrage für einen bekannten Nutzer
+  \item \textbf{TC15} - Anfrage für eine nicht existierende IDP-Nummer
+  \item \textbf{TC16} - Leerer Wert bei IDP-Nummer
+\end{itemize}
+
+Somit ist auch für diesen Endpunkt eine saubere Validierung und Fehlertoleranz sichergestellt.
