@@ -6,7 +6,7 @@ Zur Sicherstellung der Funktionsfähigkeit des gesamten Systems wurden automatis
 
 \paragraph{Initialisierungsskript}
 
-Um in der Pipeline eine konsistente Testumgebung sicherzustellen, wurde ein separates Initialisierungsskript \texttt{init-ldap.sh} erstellt. Dieses Skript stellt sicher, dass der OpenLDAP-Container vollständig gestartet ist und initialisiert anschließend die Datenbank mit einer vordefinierten Struktur sowie Testdaten. Dazu gehören die benutzerdefinierte Schema-Datei, die organisatorische Struktur, Gruppen und Beispielbenutzer.
+Um in der Pipeline eine konsistente Testumgebung sicherzustellen, wurde ein separates Initialisierungsskript \texttt{init-ldap.sh} erstellt. Dieses Skript stellt sicher, dass der OpenLDAP-Container vollständig gestartet ist und initialisiert anschlieend die Datenbank mit einer vordefinierten Struktur sowie Testdaten. Dazu gehören die benutzerdefinierte Schema-Datei, die organisatorische Struktur, Gruppen und Beispielbenutzer.
 
 \begin{lstlisting}[language=bash, caption={Von ChatGPT generiertes Initialisierungsskript für LDAP-Daten in der CI/CD-Pipeline}]
 #!/bin/bash
@@ -52,7 +52,7 @@ Der neue Pipeline-Job \texttt{api-tests} wird nach dem erfolgreichen Build gesta
     \item \textbf{JDK Setup:} Da die Applikation in Java entwickelt ist, wird das Java Development Kit in Version 17 eingerichtet.
     \item \textbf{Build der Applikation:} Das Projekt wird mit \texttt{mvnw clean install} gebaut. Die Tests werden hierbei übersprungen, da sie separat mit Playwright abgedeckt werden.
     \item \textbf{Start der benötigten Container:} Die Applikation sowie der LDAP-Server werden mittels \texttt{docker-compose up -d} gestartet.
-    \item \textbf{Verfügbarkeit prüfen:} Es wird mit einem einfachen \texttt{curl}-Befehl regelmäßig geprüft, ob die Applikation über ihren Heartbeat-Endpunkt erreichbar ist.
+    \item \textbf{Verfügbarkeit prüfen:} Es wird mit einem einfachen \texttt{curl}-Befehl regelmäig geprüft, ob die Applikation über ihren Heartbeat-Endpunkt erreichbar ist.
     \item \textbf{LDAP mit Testdaten befüllen:} Das oben beschriebene Initialisierungsskript wird ausgeführt, um das LDAP-System für die Tests vorzubereiten.
     \item \textbf{Ausführen der Playwright-Tests:} Die eigentlichen API-Tests werden mit dem Befehl \texttt{npm run test:api} ausgeführt.
     \item \textbf{Aufräumen:} Unabhängig vom Testergebnis werden alle gestarteten Container am Ende wieder heruntergefahren.
@@ -167,7 +167,7 @@ public class HeartbeatController {
 
 \paragraph{Verwendung in der Pipeline}
 
-In der \texttt{pipeline.yml} wurde ein Warte-Mechanismus eingebaut, der in regelmäßigen Abständen die Erreichbarkeit dieses Heartbeat-Endpunkts prüft. Erst wenn eine gültige \texttt{HTTP 200}-Antwort empfangen wird, wird mit der Initialisierung des LDAP und dem Ausführen der Tests fortgefahren. Dadurch wird sichergestellt, dass die Tests nur unter stabilen Bedingungen starten.
+In der \texttt{pipeline.yml} wurde ein Warte-Mechanismus eingebaut, der in regelmäigen Abständen die Erreichbarkeit dieses Heartbeat-Endpunkts prüft. Erst wenn eine gültige \texttt{HTTP 200}-Antwort empfangen wird, wird mit der Initialisierung des LDAP und dem Ausführen der Tests fortgefahren. Dadurch wird sichergestellt, dass die Tests nur unter stabilen Bedingungen starten.
 
 \begin{lstlisting}[language=yaml, caption={Warten auf Heartbeat-Endpunkt in der Pipeline}]
 - name: Wait for app and LDAP to be ready
