@@ -152,6 +152,62 @@ Unter der Gruppe \texttt{Brokerportal} ist der Nutzer nicht mehr zu finden.
     \label{fig:userNICHTInBP}
 \end{figure}
 
+\subsection{Unit-Test der Mapping-Funktion}
+Auch die interne Logik zur Gruppenzuweisung und -entfernung auf LDAP-Ebene wurde mit Unit-Tests abgesichert. Ziel war es, sicherzustellen, dass die Methoden zur LDAP-Gruppenpflege korrekt und unabhängig vom Transportmedium (z.\,B. SOAP) funktionieren.
+
+Ein Beispiel hierfür ist die Methode \texttt{removeUserFromAllGroups}, welche beim Update eines Nutzers alle bisherigen Gruppenzugehörigkeiten entfernt. Diese Methode wurde mit einem gezielten Unit-Test isoliert getestet. Dabei wurde das \texttt{LdapTemplate} mittels \texttt{Mockito} gemockt und überprüft, ob der Benutzer-DN in allen relevanten Gruppen korrekt entfernt wird.
+
+\begin{lstlisting}[language=Java, caption={Unit-Test für die Methode \texttt{removeUserFromAllGroups}}, label={lst:unit-removegroups}]
+@Test
+void removeUserFromAllGroups_shouldTryToRemoveUserFromEachGroup() {
+    String userDn = "uid=testuser,ou=people";
+    String fullUserDn = userDn + ",dc=paxportal,dc=ch";
+
+    boolean result = personRepository.removeUserFromAllGroups(userDn);
+
+    assertTrue(result);
+
+    verify(ldapTemplate, atLeastOnce()).modifyAttributes(
+        anyString(),
+        argThat(mods ->
+            Arrays.stream(mods)
+                  .anyMatch(mod ->
+                      mod.getAttribute().getID().equals("member") &&
+                      mod.getAttribute().contains(fullUserDn))
+        )
+    );
+}
+\end{lstlisting}
+
+Auch die updateUser-Methode wurde mittels Unit-Test geprüft.
+
+\begin{lstlisting}[language=Java, caption={Unit-Test für die Methode \texttt{updateUser}}, label={lst:unit-updateuser}]
+@Test
+void updateUserGroup_shouldAddUserToCorrectGroups() {
+    String userDn = "uid=testuser,ou=people";
+    String fullUserDn = userDn + ",dc=paxportal,dc=ch";
+
+    CompleteUserType payload = new CompleteUserType();
+    payload.getIgRoles().add("EL_READ");
+    payload.getIgRoles().add("KL_WRITE");
+
+    personRepository.updateUserGroup(userDn, payload);
+
+    // expected: add user to 2 groups (1 from EL_, 1 from KL_)
+    verify(ldapTemplate, times(2)).modifyAttributes(
+            anyString(),
+            argThat(mods ->
+                    Arrays.stream(mods)
+                            .anyMatch(mod ->
+                                    mod.getAttribute().getID().equals("member") &&
+                                            mod.getAttribute().contains(fullUserDn))
+            )
+    );
+}
+\end{lstlisting}
+
+Durch solche Unit-Tests wird die korrekte Verarbeitung der Logik unabhängig vom Aufrufer (z.\,B. dem SOAP-Webservice) überprüft. Dies erhöht sowohl die Wartbarkeit als auch die Robustheit der Anwendung.
+
 \paragraph{Fazit:} Die Tests der Mapping-Funktion zeigen, dass Nutzerdaten korrekt entsprechend ihrer Rolle den vorgesehenen LDAP-Gruppen zugeordnet werden. Auch eine Änderung der Rolle führt zur Anpassung der Gruppenzuordnung, wie beabsichtigt.
 
 \section{API-Tests mit Playwright}
