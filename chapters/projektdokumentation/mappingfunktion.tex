@@ -128,10 +128,10 @@ Hier die komplette \texttt{removeUserFromAllGroup} Methode:
 
 \subsection{Hinzufügen des Nutzers zu den neuen Gruppen}
 
-Nachdem der Nutzer aus allen bestehenden LDAP-Gruppen entfernt wurde (siehe Abschnitt~\ref{lst:removeUserFromAllGroups}), wird er in einem zweiten Schritt wieder den richtigen Gruppen zugewiesen. Dies geschieht auf Basis der Rollen, die im sogenannten \texttt{CompleteUserType}-Objekt übermittelt werden. Die zentrale Methode für diese Aufgabe heisst \texttt{updateUserGroup} und befindet sich in der Datei \texttt{PersonRepositoryImpl.java}.
+Nachdem der Nutzer aus allen bestehenden LDAP-Gruppen entfernt wurde (siehe Abschnitt~12.1.2), wird er in einem zweiten Schritt wieder den richtigen Gruppen zugewiesen. Dies geschieht auf Basis der Rollen, die im sogenannten \texttt{CompleteUserType}-Objekt übermittelt werden. Die zentrale Methode für diese Aufgabe heisst \texttt{updateUserGroup} und befindet sich in der Datei \texttt{PersonRepositoryImpl.java}.
 
 \subsubsection*{Zweck der Methode}
-Die Methode analysiert die Rollen des Nutzers (\texttt{igRoles}), vergleicht sie mit der Konfiguration aus der \texttt{application.yml}, und fügt den Nutzer dann den passenden Gruppen im LDAP hinzu.
+Die Methode analysiert die Rollen des Nutzers (\texttt{igRoles}), vergleicht sie mit der Konfiguration aus der  \\ \texttt{application.yml}, und fügt den Nutzer dann den passenden Gruppen im LDAP hinzu.
 
 \subsubsection*{Aufbau der Methode}
 Im Folgenden werden die wichtigsten Bestandteile der Methode schrittweise erklärt und jeweils mit einem Codeausschnitt ergänzt.

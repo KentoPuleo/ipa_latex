@@ -1,8 +1,250 @@
 \chapter{Test/Qualitätssicherung}
-Beschreibung der Test- und Qualitätssicherungsphase. 
+\vspace{-3em}
 
-\section{Mapping-Funktionen}
-Beschreibung der Mapping-Funktionen. 
+Die Qualitätssicherung spielte im gesamten Projektverlauf eine zentrale Rolle. Ziel war es, sicherzustellen, dass alle implementierten Funktionen – insbesondere die LDAP-Zuordnung über die Mappingfunktion sowie die SOAP-Schnittstellen – korrekt, robust und nachvollziehbar arbeiten. 
 
-\section{Testautomation}
-Beschreibung der Testautomation. 
+Dazu wurden sowohl manuelle als auch automatisierte Testverfahren eingesetzt. In der frühen Entwicklungsphase kam \texttt{SOAP UI} zum Einsatz, um gezielt einzelne Funktionen zu testen, insbesondere die korrekte Verarbeitung und Umsetzung von Nutzerdaten in der LDAP-Struktur. 
+
+Die nachfolgenden Abschnitte beschreiben die eingesetzten Testmethoden, deren Aufbau sowie ausgewählte Beispiele zur Veranschaulichung.
+
+
+\section{Test der Mapping-Funktion}
+Die korrekte Umsetzung der Mapping-Logik wurde zunächst mithilfe von \texttt{SOAP UI} manuell getestet. Dazu wurden gezielt Nutzerdaten mit unterschiedlichen Rollen (z.\,B. \texttt{EL\_} oder \texttt{KL\_}) übermittelt, um zu überprüfen, ob die resultierenden LDAP-Einträge korrekt den entsprechenden Organisationseinheiten (OUs) und Gruppen zugeordnet wurden. Getestet wurde lokal gegen eine OpenLDAP-Instanz im Docker-Container.
+
+\subsection{Erster Test der Mapping-Funktion EL}
+Als erstes wurde sich ein Test-Nutzer ausgewählt, der keine Rolle im System hatte. Dieser hatte folgende Eigenschaften:
+\begin{itemize}
+    \item \texttt{cn}: \texttt{Max Mustermann}
+    \item \texttt{email}: \texttt{max.mustermann@pax.ch}
+    \item \texttt{IDP-Nummer}: \texttt{001}
+    \item \texttt{Rolle}: \texttt{keine}
+\end{itemize}
+
+Nun wurde ein updateUser-Request an die SOAP-API geschickt, wobei die Rolle auf \texttt{EL\_} gesetzt wurde.
+
+\begin{lstlisting}[language=xml, caption=updateUser-Request für Test-Nutzer zur Mapping-Funktion EL]
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+    <soapenv:Header/>
+    <soapenv:Body>
+        <user:updateUserType xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+            <idpUserId>001</idpUserId>
+            <orgId>1</orgId>
+            <igRoles>EL_OFFERT</igRoles>
+            <orgRegNo>10</orgRegNo>
+            ...
+            <employed>true</employed>
+            <givenName>Max</givenName>
+            <surname>Mustermann</surname>
+            <userEmail>max.mustermann@pax.ch</userEmail>
+            ...
+        </user:updateUserType>
+    </soapenv:Body>
+</soapenv:Envelope>
+\end{lstlisting}
+
+Als Antwort erhielt man folgende XML-Datei:
+
+\begin{lstlisting}[language=xml, caption=updateUser-Response für Test-Nutzer zur Mapping-Funktion]
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+   <SOAP-ENV:Header/>
+   <SOAP-ENV:Body>
+      <ns3:commonReturnType xmlns:ns3="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+         <returnCode>OK</returnCode>
+      </ns3:commonReturnType>
+   </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+\end{lstlisting}
+
+Auf dem ersten Blick scheint der Request erfolgreich zu sein. Um dies zu überprüfen, wurde die LDAP-Struktur betrachtet.
+
+Der Nutzer ist wie vorgesehen in der Gruppe \texttt{Brokerdashboard} zu finden.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{images/userInBD.png}
+    \caption{Test-Nutzer in der LDAP-Datenbank, in der Gruppe Brokerdashboard}
+    \label{fig:userInBD}
+\end{figure}
+
+So auch in der Gruppe \texttt{Brokerportal}.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{images/userInBP.png}
+    \caption{Test-Nutzer in der LDAP-Datenbank, in der Gruppe Brokerportal}
+    \label{fig:userInBP}
+\end{figure}
+
+Ebenso in der Gruppe \texttt{Logismata}.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{images/userInLogismata.png}
+    \caption{Test-Nutzer in der LDAP-Datenbank, in der Gruppe Logismata}
+    \label{fig:userInLogismata}
+\end{figure}
+
+Und auch in der Gruppe \texttt{Quicksale}.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{images/userInQS.png}
+    \caption{Test-Nutzer in der LDAP-Datenbank, in der Gruppe Quicksale}
+    \label{fig:userInQS}
+\end{figure}
+
+Der Nutzer ist jedoch nicht in der Gruppe \texttt{Vertragsservice} zu finden, da diese Gruppe nicht zu den EL-Gruppen gehört.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{images/userNICHTInVS.png}
+    \caption{Test-Nutzer in der LDAP-Datenbank, nicht in der Gruppe Vertragsservice}
+    \label{fig:userNICHTInVS}
+\end{figure}
+
+\subsection{Zweiter Test der Mapping-Funktion KL}
+Um wirklich sicherzustellen das die Mapping-Funktion korrekt arbeitet, wurde ein weiterer Test durchgeführt, dieses Mal mit der Rolle \texttt{KL\_}.
+Es wurde der gleiche Test-Nutzer verwendet, um zu zeigen, dass die Mapping-Funktion auch bei einer Umstellung auf eine \texttt{KL\_}-Rolle korrekt funktioniert, also den Nutzer den Kollektivleben-Gruppen zuordnet und ihn gleichzeitig aus den vorherigen \texttt{EL\_}-Gruppen entfernt.
+
+\begin{lstlisting}[language=xml, caption=updateUser-Request für Test-Nutzer zur Mapping-Funktion KL]
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+    <soapenv:Header/>
+    <soapenv:Body>
+        <user:updateUserType xmlns:user="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+            <idpUserId>001</idpUserId>
+            <orgId>1</orgId>
+            <igRoles>KL_OFFERT</igRoles>
+            <orgRegNo>10</orgRegNo>
+            ...
+            <employed>true</employed>
+            <givenName>Max</givenName>
+            <surname>Mustermann</surname>
+            <userEmail>max.mustermann@pax.ch</userEmail>
+            ...
+        </user:updateUserType>
+    </soapenv:Body>
+</soapenv:Envelope>
+\end{lstlisting}
+
+Als Antwort erhielt man folgende XML-Datei:
+
+\begin{lstlisting}[language=xml, caption=updateUser-Response für Test-Nutzer zur Mapping-Funktion]
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+   <SOAP-ENV:Header/>
+   <SOAP-ENV:Body>
+      <ns3:commonReturnType xmlns:ns3="http://www.igb2b.ch/userProvisioningSchemaTypes-v3.0/">
+         <returnCode>OK</returnCode>
+      </ns3:commonReturnType>
+   </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+\end{lstlisting}
+
+Auch hier wurde in der LDAP-Datenbank die Gruppenzuordnung überprüft.
+
+Der Nutzer ist nun in der Gruppe \texttt{Vertragsservice} zu finden.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{images/userInVS.png}
+    \caption{Test-Nutzer in der LDAP-Datenbank, in der Gruppe Vertragsservice}
+    \label{fig:userInVS}
+\end{figure}
+
+Unter der Gruppe \texttt{Brokerportal} ist der Nutzer nicht mehr zu finden.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{images/userNICHTInBP.png}
+    \caption{Test-Nutzer in der LDAP-Datenbank, nicht in der Gruppe Brokerportal}
+    \label{fig:userNICHTInBP}
+\end{figure}
+
+\paragraph{Fazit:} Die Tests der Mapping-Funktion zeigen, dass Nutzerdaten korrekt entsprechend ihrer Rolle den vorgesehenen LDAP-Gruppen zugeordnet werden. Auch eine Änderung der Rolle führt zur Anpassung der Gruppenzuordnung, wie beabsichtigt.
+
+\section{API-Tests mit Playwright}
+
+Zur Sicherstellung der Funktionalität der SOAP-Endpunkte (\texttt{addUser}, \texttt{updateUser}, \texttt{deleteUser}, \texttt{getUserStatus}) wurden automatisierte Tests mit \texttt{Playwright} implementiert. Dabei wird überprüft, ob die Rückgabe der API auf definierte Eingaben dem erwarteten Verhalten entspricht. Sowohl gültige als auch fehlerhafte Eingaben wurden berücksichtigt, um auch Randfälle abzudecken.
+
+Für die lokale Ausführung der Tests wurde im \texttt{package.json} ein eigener Testbefehl hinterlegt:
+
+\begin{lstlisting}[language=json, caption=Test-Befehl in package.json]
+"test:api": "npx playwright test --config=playwright.config.ts --workers=5"
+\end{lstlisting}
+
+Die Tests werden mit fünf parallelen Worker-Threads ausgeführt, was zu einer deutlich schnelleren Testdauer führt.
+
+Verwendet wird die Konfigurationsdatei \texttt{playwright.config.ts}, in der die Testumgebung definiert ist. Sie legt unter anderem das globale Setup, das Testverzeichnis sowie die Basis-URL für die Testanfragen fest:
+
+\begin{lstlisting}[language=typescript, caption=Konfiguration der Testumgebung (playwright.config.ts)]
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+    globalSetup: './api-tests/globalSetup.ts',
+    testDir: './api-tests',
+    timeout: 30000,
+    retries: 2,
+    use: {
+        baseURL: 'http://localhost:8080',
+        ignoreHTTPSErrors: true,
+    },
+});
+\end{lstlisting}
+
+Die Tests werden anschließend mit folgendem Befehl gestartet:
+
+\begin{lstlisting}[language=bash, caption=Ausführen der API-Tests]
+npm run test:api
+\end{lstlisting}
+
+Nach dem Start gibt \texttt{Playwright} das Testergebnis direkt in der Konsole aus. Ein erfolgreicher Testdurchlauf sieht wie folgt aus:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{images/testresult.png}
+    \caption{Ergebnis der API-Tests in der Konsole}
+    \label{fig:testresult}
+\end{figure}
+
+\paragraph{Fazit:} Die erfolgreiche Ausführung der Tests bestätigt, dass die implementierten SOAP-Endpunkte erwartungsgemäß reagieren und die definierten Rückgabewerte liefern.
+
+
+\section{CI/CD-Pipeline und Testintegration}
+
+Zur automatisierten Ausführung von Build- und Testprozessen wurde im Projekt eine GitHub-Actions-basierte CI/CD-Pipeline eingesetzt. Diese Pipeline wird bei jedem \texttt{push} ins Repository automatisch gestartet und führt die folgenden Schritte aus:
+
+\begin{enumerate}
+    \item Kompilierung und Build der Applikation
+    \item Starten der Docker-Container für Applikation und OpenLDAP
+    \item Initialisierung des LDAP mit Testdaten
+    \item Ausführung der automatisierten API-Tests mit Playwright
+    \item Bereinigung der Umgebung
+\end{enumerate}
+
+Die folgende Abbildung zeigt die vollständige Pipeline mit allen durchgeführten Schritten:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{images/pipelineSuccessGrob.png}
+    \caption{GitHub Actions – Übersicht der CI/CD-Pipeline}
+    \label{fig:pipeline-grob}
+\end{figure}
+
+Alle relevanten Aktionen wurden erfolgreich durchlaufen. Besonders wichtig ist dabei die Phase \texttt{api-tests}, in der die Playwright-Tests gegen die laufende Applikation ausgeführt werden. Auch hier liefen alle Tests fehlerfrei durch:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4
+    \textwidth]{images/pipelineSuccessDetailed.png}
+    \caption{Erfolgreicher Playwright-Testlauf innerhalb der CI/CD-Pipeline}
+    \label{fig:pipeline-details}
+\end{figure}
+
+\subsection*{Fehlermeldung bei nicht erreichbarem Service}
+
+Um sicherzustellen, dass die Playwright-Tests nur dann gestartet werden, wenn die Applikation vollständig hochgefahren ist, wurde ein \texttt{globalSetup}-Skript implementiert. Dieses überprüft vor Testbeginn, ob die SOAP-Schnittstelle unter \texttt{localhost:8080} erreichbar ist.
+
+Ist dies nicht der Fall, wird der Testprozess abgebrochen und eine verständliche Fehlermeldung ausgegeben. Dadurch wird verhindert, dass Tests fälschlicherweise als fehlerhaft markiert werden, obwohl lediglich der Service noch nicht gestartet wurde.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth]{images/servicenichterreichbar.png}
+    \caption{Fehlermeldung bei nicht erreichbarem Service}
+    \label{fig:servicenichterreichbar}
+\end{figure}
+
+
+\paragraph{Fazit:} Durch die Einbindung der API-Tests in die CI/CD-Pipeline wird sichergestellt, dass jede Änderung im Repository automatisch überprüft wird. Dies gewährleistet eine kontinuierliche Qualitätssicherung und reduziert das Risiko, fehlerhafte Änderungen in produktionsnahe Umgebungen zu übernehmen.
+

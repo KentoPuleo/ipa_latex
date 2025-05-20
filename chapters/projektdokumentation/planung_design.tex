@@ -41,7 +41,7 @@ Die neue Struktur ist robuster, besser wartbar und reduziert manuelle Eingriffe 
 
 Um eine zentrale und flexible Steuerung der Gruppenzuweisung im LDAP-Verzeichnis zu ermöglichen, wird ein rollenbasiertes Mapping über die Konfigurationsdatei \texttt{application.yml} realisiert. Diese Konfiguration erlaubt es, bestimmte Rollenpräfixe, wie sie im SOAP-Payload unter \texttt{igRoles} übermittelt werden, vordefinierten Gruppen im LDAP-Verzeichnis zuzuordnen.
 
-Die Gruppen befinden sich unter dem in der Konfiguration definierten \texttt{groupSearchBase} \texttt{ou=groups,dc=paxportal,dc=ch}. Für jede Rollenfamilie (z.\,B. \texttt{EL\_} für Einzelleben oder \texttt{KL\_} für Kollektivleben) ist eine Liste von Gruppen hinterlegt, in die Benutzer automatisch aufgenommen werden, sofern die entsprechende Rolle im Payload enthalten ist.
+Die Gruppen befinden sich unter dem in der Konfiguration definierten \texttt{groupSearchBase} \texttt{ou=groups, \\ dc=paxportal,dc=ch}. Für jede Rollenfamilie (z.\,B. \texttt{EL\_} für Einzelleben oder \texttt{KL\_} für Kollektivleben) ist eine Liste von Gruppen hinterlegt, in die Benutzer automatisch aufgenommen werden, sofern die entsprechende Rolle im Payload enthalten ist.
 
 Die Abkürzungen EL und KL orientieren sich an der fachlichen Struktur der Pax:
 \begin{itemize}
@@ -268,7 +268,7 @@ In diesem Projekt wird Playwright verwendet, um die vier zentralen Funktionen de
 
 \textbf{Vergleich mit Alternativen:} Vor der Entscheidung für Playwright wurden auch andere Tools in Betracht gezogen, wie etwa:
 \begin{itemize}
-  \item \textbf{Postman/Newman:} Gute Unterstützung für einfache REST-Tests, aber eingeschränkte SOAP-Funktionalität und weniger flexible Automatisierung.
+  \item \textbf{Postman/Newman:} Gute Unterstützung für einfache REST-Tests, aber eingeschränkte \\ SOAP-Funktionalität und weniger flexible Automatisierung.
   \item \textbf{REST Assured (Java):} Sehr leistungsfähig für HTTP-Tests, allerdings eng an die Java-Welt gebunden und weniger etabliert im Team.
   \item \textbf{SoapUI:} Gut geeignet für manuelle Tests, aber weniger flexibel für API-Testautomatisierung in CI/CD.
 \end{itemize}

@@ -1,8 +1,33 @@
-\chapter{Ergebnisse}
-Beschreibung der erzielten Ergebnisse. 
+\chapter{Ergebnisse \& Ausblick}
+\vspace{-3em}
+In diesem Kapitel werden zunächst die zentralen Ergebnisse dieser Arbeit zusammengefasst. Dabei liegt der Fokus auf den funktionalen Erweiterungen und der technischen Umsetzung innerhalb der gegebenen Systemumgebung. Anschließend folgt ein Ausblick auf mögliche Weiterentwicklungen sowie Empfehlungen für den zukünftigen Einsatz und Ausbau der Lösung.
 
-\section{Mapping-Funktionen}
-Beschreibung der Mapping-Funktionen. 
 
-\section{Testautomation}
-Beschreibung der Testautomation. 
+\section{Ergebnisse der Umsetzung}
+
+Im Rahmen dieser Arbeit wurde die bestehende Funktionalität zur Benutzerpflege über die SOAP-Schnittstelle gezielt erweitert und technisch abgesichert. 
+
+Konkret wurde die \texttt{updateUser}-Funktion um eine rollenbasierte Mapping-Logik ergänzt. Diese ermöglicht es, Benutzer abhängig von den im XML definierten Rollen automatisch der passenden LDAP-Gruppe zuzuweisen. Die Logik berücksichtigt dabei vordefinierte Rollenmuster wie \texttt{EL\_} oder \texttt{KL\_} und weist entsprechende Gruppen in der LDAP-Struktur zu.
+
+Zur Sicherstellung der Funktionalität wurde für alle vier Endpunkte (\texttt{addUser}, \texttt{updateUser}, \texttt{deleteUser}, \\ 
+\texttt{getUserStatus}) eine vollautomatisierte Testabdeckung mit Playwright entwickelt. Diese Tests lassen sich lokal ausführen und überprüfen sowohl die korrekte Verarbeitung gültiger Nutzerdaten als auch typische Fehlerfälle.
+
+Darüber hinaus wurden die Tests in die bestehende GitHub-Actions-Pipeline integriert. Um sicherzustellen, dass die Tests erst bei verfügbarer LDAP-Verbindung ausgeführt werden, wurde ein Heartbeat-Mechanismus implementiert, der die Erreichbarkeit des Verzeichnisses vor dem Teststart überprüft.
+
+Insgesamt wurde somit eine robuste, erweiterbare und automatisiert überprüfbare Grundlage für die weitere Integration der Benutzerverwaltung geschaffen.
+
+
+
+\section{Ausblick und Weiterentwicklung}
+
+Die umgesetzte Lösung bietet eine solide Grundlage für die automatisierte Verwaltung von Benutzern über eine SOAP-Schnittstelle mit LDAP-Anbindung. Dennoch bestehen mehrere sinnvolle Ansatzpunkte für eine zukünftige Weiterentwicklung.
+
+Ein wesentliches Potenzial liegt in der Verfeinerung der bestehenden Mapping-Funktion. Derzeit basiert diese auf einfachen Präfixen wie \texttt{EL\_} oder \texttt{KL\_}. In einem nächsten Schritt könnte zusätzlich die Art der Berechtigung (z.\,B. Lese- oder Schreibrechte) berücksichtigt werden, um eine noch gezieltere Gruppenzuordnung zu ermöglichen.
+
+Zudem sollte die Mapping-Logik nicht nur in der \texttt{updateUser}-Funktion, sondern auch in \texttt{addUser} integriert werden. So kann die Gruppenzuweisung bereits beim erstmaligen Anlegen eines Nutzers erfolgen und muss nicht nachträglich ergänzt werden. Darüber hinaus wäre es wünschenswert, dass \texttt{addUser} auch dann erfolgreich einen Eintrag erstellt, wenn beispielsweise die angegebene E-Mail-Adresse nicht im System bekannt ist – idealerweise mit einem Hinweis auf den fehlenden Abgleich.
+
+Im Bereich der CI/CD-Pipeline bietet sich die Entwicklung einer eigenen GitHub Action an, mit der gezielte Testdaten als Input definiert und die entsprechenden XML-Antworten automatisiert validiert werden können. Das würde die Wartbarkeit und Nachvollziehbarkeit der Tests weiter verbessern.
+
+Ein weiterer Entwicklungsschritt wäre die Ausführung der Tests nicht nur lokal, sondern auch innerhalb der Testumgebung. Aufgrund technischer Einschränkungen konnte dies im Rahmen dieser Arbeit noch nicht umgesetzt werden. In Zukunft sollte geprüft werden, ob dafür ein selbst gehosteter GitHub Runner eingesetzt werden kann oder ob eine alternative Lösung besser geeignet ist.
+
+Diese Weiterentwicklungen würden die Lösung funktional abrunden und die Grundlage für einen produktiven Einsatz in komplexeren Szenarien schaffen.

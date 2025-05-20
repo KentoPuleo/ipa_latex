@@ -27,7 +27,7 @@ Diese Struktur ermöglicht es, die Testfälle übersichtlich zu organisieren und
 
 Zur Erzeugung valider und ungültiger SOAP-Anfragen wurde im Verzeichnis \texttt{api-tests/services} ein separater Service namens \texttt{createXmlService.ts} implementiert. Dieser stellt Funktionen bereit, die dynamisch XML-Anfragen für alle unterstützten Endpunkte erzeugen.
 
-Die generierten XMLs basieren auf dem offiziellen Schema der Schnittstelle (\texttt{userProvisioningSchemaTypes-v3.0}) und können mit konkreten Nutzerdaten befüllt werden. Dadurch wird sichergestellt, dass die Tests sowohl syntaktisch korrekte als auch gezielt fehlerhafte Payloads erzeugen können.
+Die generierten XMLs basieren auf dem offiziellen Schema der Schnittstelle (\texttt{userProvisioningSchemaTypes \\ -v3.0}) und können mit konkreten Nutzerdaten befüllt werden. Dadurch wird sichergestellt, dass die Tests sowohl syntaktisch korrekte als auch gezielt fehlerhafte Payloads erzeugen können.
 
 Der Service umfasst folgende Funktionen:
 
@@ -454,7 +454,7 @@ test('TC13: deleteUser - no value', async ({ request }) => {
 
 \subsubsection*{Fazit}
 
-Die Tests stellen sicher, dass der Endpunkt \texttt{deleteUser} korrekt funktioniert - sowohl bei gültiger als auch bei fehlerhafter Eingabe. Durch gezielte Fehlersimulationen wird überprüft, ob die API erwartungsgemä reagiert.
+Die Tests stellen sicher, dass der Endpunkt \texttt{deleteUser} korrekt funktioniert - sowohl bei gültiger als auch bei fehlerhafter Eingabe. Durch gezielte Fehlersimulationen wird überprüft, ob die API erwartungsgemäß reagiert.
 
 \subsubsection*{Testfallübersicht}
 
