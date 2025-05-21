@@ -1,12 +1,11 @@
 \chapter{Kurzfassung}
 \vspace{-3em}
-Kurze Zusammenfassung der Arbeit.
 
-\section{Ausgangslage}
-Beschreibung der Ausgangssituation.
+\subsection*{Ausgangslage:}
+Die Pax nutzt die EcoHub-Plattform für die Zusammenarbeit mit Maklern, wobei Benutzerverwaltung und Rollenzuweisung bislang manuell im LDAP erfolgten. Diese Prozesse waren fehleranfällig, aufwendig und boten keine automatisierte Testabdeckung der Schnittstellen. Die steigenden Anforderungen an Zuverlässigkeit und Wartbarkeit machten eine Modernisierung notwendig.
 
-\section{Zielsetzung}
-Beschreibung der zu erreichenden Ziele.
+\subsection*{Zielsetzung:}
+Das Ziel des Projekts war die Entwicklung einer automatisierten, regelbasierten Mapping-Funktion zur Zuordnung von Nutzern zu Applikationsgruppen im LDAP sowie die Einführung einer umfassenden API-Testautoma- \\ tisierung. Die Tests sollten alle relevanten Schnittstellen (\texttt{addUser}, \texttt{updateUser}, \texttt{deleteUser}, \texttt{getUserStatus}) abdecken und in die bestehende CI/CD-Pipeline integriert werden, um Fehler frühzeitig zu erkennen und die Qualität der Benutzerverwaltung nachhaltig zu sichern.
 
-\section{Ergebnis}
-Beschreibung der erzielten Ergebnisse. 
+\subsection*{Ergebnis:}
+Die Mapping-Funktion wurde erfolgreich implementiert und ermöglicht nun eine automatische, konfigurierbare Gruppenzuweisung auf Basis von Rollenpräfixen. Für sämtliche API-Endpunkte wurden mit Playwright automatisierte Tests entwickelt, die sowohl lokal als auch in der CI/CD-Pipeline ausgeführt werden. Die Tests prüfen die korrekte Verarbeitung von Nutzerdaten und typische Fehlerfälle, wodurch die Zuverlässigkeit der Schnittstellen signifikant erhöht wurde. Die gesamte Lösung ist modular aufgebaut, dokumentiert und unterstützt eine effiziente Weiterentwicklung. Damit wurde eine robuste Grundlage für die automatisierte, qualitätsgesicherte Benutzerverwaltung im EcoHub-Service geschaffen.
