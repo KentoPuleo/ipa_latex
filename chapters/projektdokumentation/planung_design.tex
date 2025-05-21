@@ -277,13 +277,27 @@ Die Entscheidung fiel letztlich zugunsten von Playwright, da es bereits im Unter
 
 
 \subsection{Versionierung}
-Eine sicheres Versionierungsverwaltung ist besonders wichtig, sollten Daten verloren gehen, kann diese Sicherung die Daten wiederherstellen.
+Eine sichere Versionsverwaltung ist besonders wichtig. Sollte es zu Datenverlust oder Fehlern kommen, kann eine saubere Versionierung die Wiederherstellung der letzten funktionierenden Version ermöglichen.
 
-In dieser Arbeit wird für die Versionierung Git mit der Online-Plattform Github verwendet, da die Pax bereits Github als VCS verwendet.
+In dieser Arbeit wird für die Versionierung \textbf{Git} in Kombination mit der Online-Plattform \textbf{GitHub} verwendet. Dies entspricht auch dem Vorgehen im Unternehmen Pax, welches GitHub als Standard-VCS nutzt.
 
-Git ist ein verteiltes Versionskontrollsystem, mit dem Entwickler den Verlauf von Änderungen an Dateien \- insbesondere Quellcode \- nachverfolgen können. Es ermöglicht mehrere parallele Entwicklungszweige, erleichtert das Zusammenführen von Änderungen und unterstützt das Arbeiten im Team ohne Datenverlust.
+\textbf{Git} ist ein verteiltes Versionskontrollsystem, mit dem Änderungen an Dateien – insbesondere Quellcode – nachvollzogen, rückgängig gemacht oder zusammengeführt werden können. Es erlaubt parallele Entwicklungszweige (Branches) und bietet vollständige Nachvollziehbarkeit aller Änderungen über sogenannte Commits.
 
-GitHub ist  die dazu passende Online-Plattform, die Git-Repositories hostet. Sie bietet zusätzliche Funktionen wie Benutzeroberfläche, Pull Requests, Issue-Tracking und CI/CD-Integration. GitHub erleichtert die Zusammenarbeit an Softwareprojekten und macht den Code öffentlich oder privat zugänglich.
+\textbf{GitHub} bietet als Cloud-Dienst für Git-Repositories eine intuitive Weboberfläche, Pull Requests, Issue-Tracking, eine Commit-Historie sowie die Integration von CI/CD-Prozessen. Dadurch wird eine strukturierte und nachvollziehbare Entwicklung sichergestellt.
+
+\textbf{In dieser Arbeit wurde für jedes neue Feature oder jede relevante Änderung ein separater Commit durchgeführt}. Dadurch bleibt der Verlauf der Entwicklung klar nachvollziehbar (siehe Abbildung~\ref{fig:github-commits}).
+
+Zudem wurde ein \textbf{eigener Branch} mit dem Namen \texttt{ipa/mapping-funktion} erstellt, in welchem alle Entwicklungen rund um die Mapping-Funktion implementiert wurden.  
+Nach Abschluss dieser Arbeiten wurde ein \textbf{Pull Request} erstellt, um den Branch in den \texttt{main}-Zweig zu integrieren. Dies stellt sicher, dass Änderungen nachvollziehbar überprüft und gezielt zusammengeführt werden.
+
+\vspace{1em}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{images/github_versionierung.png}
+  \caption{Pull Request mit strukturierter Commit-Historie im Branch \texttt{ipa/mapping-funktion}}
+  \label{fig:github-commits}
+\end{figure}
+
 
 \section{Clean Code Prinzipien und Namenskonzept}
 

@@ -1,22 +1,72 @@
 \chapter{Backupkonzept}
 \vspace{-3em}
-Während dieser Arbeit wird die 3-2-1-1-0-Methode verwendet. Diese ist eine moderne Erweiterung der klassischen 3-2-1-Methode.
-In der 3-2-1-Methode stehen die einzelnen Zahlen für folgende Regeln.
+
+Während dieser Arbeit kommt die moderne \textbf{3-2-1-1-0-Backup-Strategie} zum Einsatz. Diese Regel dient der langfristigen Sicherstellung der Datenverfügbarkeit und schützt insbesondere vor Datenverlust durch Hardwarefehler, menschliches Versagen oder Schadsoftware.
+
+\section*{Grundlagen der 3-2-1-1-0-Regel}
+
+Die einzelnen Zahlen stehen für folgende Prinzipien:
 
 \begin{itemize}
-    \item [3.] Mindestens drei Kopien
-    \item [2.] Auf mindestens zwei verschiedenen Medientypen. (z.B. Lokale Festplatte und Cloud)
-    \item [1.] Und mindestens eine Kopie muss an einem geografisch anderen Standort sein.  
+  \item[3.] Es existieren mindestens \textbf{drei Kopien} der Daten.
+  \item[2.] Die Kopien befinden sich auf \textbf{mindestens zwei unterschiedlichen Speichermedien}.
+  \item[1.] Mindestens \textbf{eine Kopie} befindet sich \textbf{an einem anderen physischen Standort}.
+  \item[1.] Mindestens \textbf{eine Kopie ist offline und unveränderlich}, z.\,B. durch Versionskontrolle.
+  \item[0.] \textbf{Null Fehler} in den Backups – alle Versionen werden regelmäßig überprüft.
 \end{itemize}
 
-Das Ziel dieser Methode ist es, einerseits eine sichere Datenenerhältlichkeit zu gewährleisten und ebenfalls bei Problemen keine Daten zu verlieren.
+\section*{Umsetzung in der IPA}
 
-In der modernen 3-2-1-1-0-Methode werden zwei neue Regeln hinzugefügt.
+Zur Sicherstellung der Datenintegrität und Nachvollziehbarkeit habe ich folgende Backup-Strategie umgesetzt:
+
+\begin{enumerate}
+  \item \textbf{Lokale Speicherung:}  
+  Die aktuelle Version der Dokumentation wird lokal auf meinem Rechner unter \texttt{Dokumente/IPA} gesichert.  
+  \textit{(siehe Abbildung~\ref{fig:lokal})}
+
+    \begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/dokument_speicher.png}
+    \caption{Lokale Sicherung im Verzeichnisstruktur „Dokumente/IPA“}
+    \label{fig:lokal}
+    \end{figure}
+
+  \item \textbf{Cloud-Speicherung via Google Drive:}
+  Täglich wird die aktuelle Version zusätzlich auf Google Drive hochgeladen. Jede Version wird dabei mit eindeutiger Versionsnummer gespeichert.  
+  \textit{(siehe Abbildung~\ref{fig:drive})}
+
+  \begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/dokument_speicher_drive.png}
+    \caption{Tägliche Sicherungen auf Google Drive mit klarer Versionierung}
+    \label{fig:drive}
+  \end{figure}
+
+  \item \textbf{Versionskontrolle via GitHub:}  
+  Parallel dazu verwalte ich das Projekt in einem öffentlichen GitHub Repository. Durch Git-Commits werden Änderungen dokumentiert und nachvollziehbar archiviert.  
+  \textit{(siehe Abbildung~\ref{fig:github})}
+
+  \begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{images/dokument_speicher_github.png}
+    \caption{Versionierung und Backup auf GitHub mit Commit-Historie}
+    \label{fig:github}
+  \end{figure}
+
+\end{enumerate}
+
+Diese Strategie erfüllt die \textbf{3-2-1-1-0-Regel} wie folgt:
 
 \begin{itemize}
-    \item [1.] Mindestens eine Kopie sollte offline sein, also nicht mit dem Netzwerk verbunden und unveränderlich. 
-    \item [0.] Die Kopien dürfen keine Fehler aufweisen und werden dafür regelmässig getestet.   
+  \item \textbf{3 Kopien:} Lokal, Google Drive, GitHub.
+  \item \textbf{2 Medientypen:} Lokale Festplatte (offline), Cloud-Speicher (Drive) und Versionsverwaltungssystem (Git).
+  \item \textbf{1 geografisch unabhängiger Ort:} Google Drive liegt in der Cloud – physisch unabhängig vom eigenen Rechner.
+  \item \textbf{1 Offline-Kopie:} Lokale Speicherung sowie nicht direkt bearbeitbare PDF-Versionen in Drive.
+  \item \textbf{0 Fehler:} Durch tägliche Sicherung und PDF-Export werden fehlerhafte Zwischenstände minimiert.
 \end{itemize}
 
-Mit den neuen zwei Regeln werden die Daten nun auch gegen Ransomeware oder menschliche Fehler geschützt.
-Auch das Testen der Backups wird gefordert, um ungewünschte Überraschungen zu vermeiden.
+Die tägliche Sicherung erfolgt manuell – durch Export und Upload jeder neuen Version. Änderungen sind im Git-Repository zusätzlich transparent dokumentiert.
+
+
+
+
