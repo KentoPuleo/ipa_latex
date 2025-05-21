@@ -12,7 +12,7 @@ Dieser Prozess erfolgt manuell, ist fehleranfällig und verursacht hohen adminis
 
 Sollte sich ein Broker anmelden wollen, der nicht im LDAP vorhanden ist, scheitert der Vorgang, da aktuell keine automatische Benutzererstellung existiert. Die vorhandene \texttt{addUser}-Funktion generiert eine IDP-Nummer, welche für die Durchführung des Single Sign-On (SSO) zwingend erforderlich ist. Die Web Access Management (WAM) prüft im Rahmen des SSO auf das Vorhandensein dieser IDP-Nummer. Fehlt sie, wird der Zugriff verweigert.
 
-Auf der EcoHub-Plattform existieren bereits eigene Berechtigungskonzepte. Diese stimmen grösstenteils mit jenen der Pax überein. Es wird zwischen Einzelleben (EL) und Kollektivleben (KL) unterschieden (siehe Abbildung \ref{fig:rollenEcoHub}). Obwohl diese Rollen über EcoHub zugewiesen werden können, werden sie derzeit nicht automatisch in das LDAP-Verzeichnis übernommen und operativ nicht weiterverwendet
+Auf der EcoHub-Plattform existieren bereits eigene Berechtigungskonzepte. Diese stimmen grösstenteils mit jenen der Pax überein. Es wird zwischen Einzelleben (EL) und Kollektivleben (KL) unterschieden (siehe Abbildung \ref{fig:rollenEcoHub}). Obwohl diese Rollen über EcoHub zugewiesen werden können, werden sie derzeit nicht automatisch in das LDAP-Verzeichnis übernommen und operativ nicht weiterverwendet.
 
 \vspace{1em}
 \begin{figure}[H]
@@ -374,9 +374,9 @@ Risiken sind mögliche Probleme oder Gefahren, die beim Projektverlauf oder der 
 
 
 \subsection{ Zielsetzung}
-Nun sind verschiedene Ziele für das EcoHub vorgesehen. Der ganze Prozess soll automatisiert geschehen, das bedeutet die manuelle Erstellung der Broker über die Maske fällt weg. 
-Der Broker soll die Möglichkeit bekommen, über das EcoHub sich bei der Pax anzumelden, insofern er eine Service-Vereinbarung eingegangen ist, und damit ein neuer Nutzer im LDAP erstellt und gespeichert wird. 
-Bei der Erstellung wie aber auch nachträglich sollen die Berechtigungen, die der Broker auf der EcoHub-Plattform erhält, die gleichen sein wie die im LDAP. 
+Nun sind verschiedene Ziele für das EcoHub vorgesehen. Der ganze Prozess soll automatisiert geschehen, das bedeutet, die manuelle Erstellung der Broker über die Maske fällt weg.
+Der Broker soll die Möglichkeit bekommen, über das EcoHub sich bei der Pax anzumelden, insofern er eine Service-Vereinbarung eingegangen ist, und damit ein neuer Nutzer im LDAP erstellt und gespeichert wird.
+Sowohl bei der Erstellung als auch nachträglich sollen die Berechtigungen, die der Broker auf der EcoHub-Plattform erhält, die gleichen sein wie die im LDAP.
 Auch die einzelnen Schnittstellen des EcoHub-Services sollen getestet werden, um Probleme vorzeitig zu erkennen und zu lösen.
 
 \subsection{ Abgrenzung}
@@ -385,13 +385,13 @@ Wichtig ist, sich nicht in der eigenen Arbeit zu verlieren oder sich in andere A
 Auch dass die Gruppen-Zuteilung bei der initialen Anmeldung geschieht, ist nicht Teil der IPA.
 
 \section{Erweiterte Aufgabenstellung}
-Die Aufgabe in dieser IPA bezieht sich auf zwei der Ziele. Es soll eine Mapping-Funktion geschrieben werden welche die EcoHub Rollen mit den internen Rollen verbindet. Das soll geschehen sollten sich die Rollen des Broker ändern und ein update nötig sein.
+Die Aufgabe in dieser IPA bezieht sich auf zwei der Ziele. Es soll eine Mapping-Funktion geschrieben werden, welche die EcoHub-Rollen mit den internen Rollen verbindet. Das soll geschehen, sollten sich die Rollen des Brokers ändern und ein Update nötig sein.
 Auch sollen alle Schnittstellen des EcoHub-Services automatisiert getestet werden, die Automation soll über eine Pipeline laufen.
 
 
 \section{Anforderungen}
 \subsection{Funktionale Anforderungen}
-Bei Funktionalen Anforderungen handelt es sich um das (WAS?). Was soll das System oder Produkt tun, besser gesagt welche Funktionen oder Verhaltensweisen muss es bieten. Folgend die wichtigsten Funktionalen Anforderung im bezug auf die zwei Aufträge.
+Bei Funktionalen Anforderungen handelt es sich um das (WAS?). Was soll das System oder Produkt tun, besser gesagt, welche Funktionen oder Verhaltensweisen muss es bieten. Folgend die wichtigsten Funktionalen Anforderungen im Bezug auf die zwei Aufträge.
 \subsubsection{Mapping-Funktion}
 \begin{itemize}
     \item Der Broker wird entsprechend seiner EcoHub-Rolle den korrekten Gruppen im LDAP zugeordnet.
@@ -403,9 +403,9 @@ Bei Funktionalen Anforderungen handelt es sich um das (WAS?). Was soll das Syste
 \subsubsection{API-Testautomatisierung}
 \begin{itemize}
     \item Alle bekannten API-Endpunkte des EcoHub-Provisioning-Services müssen durch automatisierte Tests abgedeckt werden. 
-    \item Die Tests müssen sicherstellen das konkrete Fehlermeldungen zurückgegeben werden.
+    \item Die Tests müssen sicherstellen, dass konkrete Fehlermeldungen zurückgegeben werden.
     \item Tests müssen jederzeit wiederholbar sein, ohne manuelle Vorbereitung (z.B. Setup- und Teardown-Routinen für Testdaten).
-    \item Die Tests müssen nicht nur wiederholbar sondern auch automatisch durchgeführt werden. 
+    \item Die Tests müssen nicht nur wiederholbar, sondern auch automatisch durchgeführt werden. 
 \end{itemize}
 
 \subsection{Nicht-funktionale Anforderungen}

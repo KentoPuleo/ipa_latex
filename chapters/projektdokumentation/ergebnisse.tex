@@ -9,7 +9,7 @@ Im Rahmen dieser Arbeit wurde die bestehende Funktionalität zur Benutzerpflege 
 
 Konkret wurde die \texttt{updateUser}-Funktion um eine rollenbasierte Mapping-Logik ergänzt. Diese ermöglicht es, Benutzer abhängig von den im XML definierten Rollen automatisch der passenden LDAP-Gruppe zuzuweisen. Die Logik berücksichtigt dabei vordefinierte Rollenmuster wie \texttt{EL\_} oder \texttt{KL\_} und weist entsprechende Gruppen in der LDAP-Struktur zu.
 
-Zur Sicherstellung der Funktionalität wurde für alle vier Endpunkte (\texttt{addUser}, \texttt{updateUser}, \texttt{deleteUser}, \\ 
+Zur Sicherstellung der Funktionalität wurde für alle vier Endpunkte (\texttt{addUser}, \texttt{updateUser}, \texttt{deleteUser}, \\
 \texttt{getUserStatus}) eine vollautomatisierte Testabdeckung mit Playwright entwickelt. Diese Tests lassen sich lokal ausführen und überprüfen sowohl die korrekte Verarbeitung gültiger Nutzerdaten als auch typische Fehlerfälle.
 
 Darüber hinaus wurden die Tests in die bestehende GitHub-Actions-Pipeline integriert. Um sicherzustellen, dass die Tests erst bei verfügbarer LDAP-Verbindung ausgeführt werden, wurde ein Heartbeat-Mechanismus implementiert, der die Erreichbarkeit des Verzeichnisses vor dem Teststart überprüft.
@@ -26,7 +26,7 @@ Ein wesentliches Potenzial liegt in der Verfeinerung der bestehenden Mapping-Fun
 
 Zudem sollte die Mapping-Logik nicht nur in der \texttt{updateUser}-Funktion, sondern auch in \texttt{addUser} integriert werden. So kann die Gruppenzuweisung bereits beim erstmaligen Anlegen eines Nutzers erfolgen und muss nicht nachträglich ergänzt werden. Darüber hinaus wäre es wünschenswert, dass \texttt{addUser} auch dann erfolgreich einen Eintrag erstellt, wenn beispielsweise die angegebene E-Mail-Adresse nicht im System bekannt ist – idealerweise mit einem Hinweis auf den fehlenden Abgleich.
 
-Im Bereich der CI/CD-Pipeline bietet sich die Entwicklung einer eigenen GitHub Action an, mit der gezielte Testdaten als Input definiert und die entsprechenden XML-Antworten automatisiert validiert werden können. Das würde die Wartbarkeit und Nachvollziehbarkeit der Tests weiter verbessern.
+Im Bereich der CI/CD-Pipeline bietet sich die Entwicklung einer eigenen GitHub Action an, mit der gezielt Testdaten als Input definiert und die entsprechenden XML-Antworten automatisiert validiert werden können. Das würde die Wartbarkeit und Nachvollziehbarkeit der Tests weiter verbessern.
 
 Ein weiterer Entwicklungsschritt wäre die Ausführung der Tests nicht nur lokal, sondern auch innerhalb der Testumgebung. Aufgrund technischer Einschränkungen konnte dies im Rahmen dieser Arbeit noch nicht umgesetzt werden. In Zukunft sollte geprüft werden, ob dafür ein selbst gehosteter GitHub Runner eingesetzt werden kann oder ob eine alternative Lösung besser geeignet ist.
 
