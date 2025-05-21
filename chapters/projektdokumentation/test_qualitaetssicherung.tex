@@ -288,7 +288,7 @@ Alle relevanten Aktionen wurden erfolgreich durchlaufen. Besonders wichtig ist d
     \label{fig:pipeline-details}
 \end{figure}
 
-\subsection*{Fehlermeldung bei nicht erreichbarem Service}
+\subsection{Fehlermeldung bei nicht erreichbarem Service}
 
 Um sicherzustellen, dass die Playwright-Tests nur dann gestartet werden, wenn die Applikation vollständig hochgefahren ist, wurde ein \texttt{globalSetup}-Skript implementiert. Dieses überprüft vor Testbeginn, ob die SOAP-Schnittstelle unter \texttt{localhost:8080} erreichbar ist.
 
@@ -301,6 +301,57 @@ Ist dies nicht der Fall, wird der Testprozess abgebrochen und eine verständlich
     \label{fig:servicenichterreichbar}
 \end{figure}
 
+\subsection{Verifikation des Cronjobs}
 
-\paragraph{Fazit:} Durch die Einbindung der API-Tests in die CI/CD-Pipeline wird sichergestellt, dass jede Änderung im Repository automatisch überprüft wird. Dies gewährleistet eine kontinuierliche Qualitätssicherung und reduziert das Risiko, fehlerhafte Änderungen in produktionsnahe Umgebungen zu übernehmen.
+Um sicherzustellen, dass der geplante Cronjob korrekt funktioniert, wurde dieser während der Entwicklungsphase temporär so konfiguriert, dass der Workflow \textbf{jede Minute} ausgeführt wurde. Dies ermöglichte eine unmittelbare Überprüfung der automatischen Auslösung über die GitHub Actions-Oberfläche.
+
+Nach erfolgreicher Validierung wurde das Cron-Intervall wieder auf die vorgesehenen Zeiten (täglich um 08:00 Uhr und 16:00 Uhr MEZ) zurückgestellt, um unnötige Ausführungen und Systembelastung zu vermeiden.
+
+Die Testkonfiguration sah kurzzeitig wie folgt aus:
+
+\begin{lstlisting}[language=yaml, caption={Temporäre Cronjob-Testkonfiguration}]
+schedule:
+  - cron: '*/1 * * * *'  # alle 1 Minute
+\end{lstlisting}
+
+Diese Vorgehensweise stellte sicher, dass der automatisierte Ablauf verlässlich funktioniert, bevor er produktiv aktiviert wurde.
+
+\subsection{Hinweis zur README-Ergänzung}
+
+Zur Unterstützung anderer Entwicklerinnen und Entwickler wurde die Projekt-\texttt{README.md}-Datei um eine kurze Anleitung zur Ausführung der API-Tests ergänzt. Diese enthält Informationen zur lokalen Ausführung der Playwright-Testfälle sowie zur Anzeige des automatisch generierten Testreports.
+
+Die Ergänzung sieht wie folgt aus:
+
+\begin{lstlisting}[language=Plaintext, caption={Ausschnitt aus der erweiterten README.md}]
+    ## API Tests with Playwright
+
+    The project includes a set of automated API tests written with [Playwright](https://playwright.dev/). These tests validate the functionality of the SOAP endpoints (`addUser`, `updateUser`, `deleteUser`, `getUserStatus`) and ensure proper LDAP integration.
+    
+    ### Running the tests locally
+    
+    To run the tests, ensure the application and the required services (e.g., OpenLDAP) are running via Docker:
+    
+    ```shell
+    docker-compose up -d
+    ```
+    
+    Then run the Playwright tests:
+    ```shell
+    npm install
+    npm run test:api
+    ```
+    
+    ### Test Resport
+    ```shell
+    npx playwright show-report
+    ```
+\end{lstlisting}
+
+\paragraph{Fazit:}
+
+Die entwickelte CI/CD-Pipeline auf Basis von GitHub Actions ermöglichte eine vollständig automatisierte Prüfung der zentralen Projektkomponenten – vom Build über die Initialisierung der Testumgebung bis hin zur Ausführung und Verifikation der API-Tests. Durch den Einsatz von Docker und Playwright konnten realitätsnahe Tests in einer isolierten Umgebung durchgeführt werden. 
+
+Das zusätzlich implementierte \texttt{globalSetup}-Skript stellte sicher, dass die Tests nur bei tatsächlich erreichbarem Service ausgeführt wurden und somit verlässliche Ergebnisse lieferten. Auch die Testbarkeit geplanter Automatismen – wie der Cronjob – wurde nachvollziehbar sichergestellt. 
+
+Insgesamt trägt die Pipeline wesentlich zur Qualität, Wartbarkeit und Reproduzierbarkeit des Systems bei und bildet die Grundlage für zukünftige Erweiterungen und produktive Einsätze.
 

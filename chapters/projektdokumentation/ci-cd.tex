@@ -55,72 +55,99 @@ Der neue Pipeline-Job \texttt{api-tests} wird nach dem erfolgreichen Build gesta
     \item \textbf{Verfügbarkeit prüfen:} Es wird mit einem einfachen \texttt{curl}-Befehl regelmäig geprüft, ob die Applikation über ihren Heartbeat-Endpunkt erreichbar ist.
     \item \textbf{LDAP mit Testdaten befüllen:} Das oben beschriebene Initialisierungsskript wird ausgeführt, um das LDAP-System für die Tests vorzubereiten.
     \item \textbf{Ausführen der Playwright-Tests:} Die eigentlichen API-Tests werden mit dem Befehl \texttt{npm run test:api} ausgeführt.
+    \item \textbf{HTML Report:} Die ausgeführten API-Tests werden alls HTML Report gespeichert.
     \item \textbf{Aufräumen:} Unabhängig vom Testergebnis werden alle gestarteten Container am Ende wieder heruntergefahren.
 \end{enumerate}
 
 \begin{lstlisting}[language=yaml, caption={GitHub Actions Job zur Ausführung der API-Tests}]
-api-tests:
-  needs: build
-  runs-on: ubuntu-latest
-  steps:
-    - name: Check out code
-      uses: actions/checkout@v4
+  api-tests:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
 
-    - name: Show current directory structure (debug)
-      run: |
-        pwd
-        ls -l
+      - name: Show current directory structure (debug)
+        run: |
+          pwd
+          ls -l
 
-    - name: Install Docker Compose
-      run: |
-        sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-        sudo chmod +x /usr/local/bin/docker-compose
-        docker-compose version
+      - name: Install Docker Compose
+        run: |
+          sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+          sudo chmod +x /usr/local/bin/docker-compose
+          docker-compose version
 
-    - name: Set up Node.js for Playwright
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
+      - name: Set up Node.js for Playwright
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
 
-    - name: Install Node.js dependencies
-      run: npm ci
-      working-directory: ${{ github.workspace }}
+      - name: Install Node.js dependencies
+        run: npm ci
+        working-directory: ${{ github.workspace }}
 
-    - name: Set up JDK
-      uses: actions/setup-java@v4
-      with:
-        distribution: 'temurin'
-        java-version: '17'
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
 
-    - name: Build project
-      run: chmod +x ./mvnw && ./mvnw clean install -DskipTests
-      working-directory: ${{ github.workspace }}
+      - name: Build project
+        run: chmod +x ./mvnw && ./mvnw clean install -DskipTests
+        working-directory: ${{ github.workspace }}
 
-    - name: Start Docker services
-      run: docker-compose up -d
-      working-directory: ${{ github.workspace }}
+      - name: Start Docker services
+        run: docker-compose up -d
+        working-directory: ${{ github.workspace }}
 
-    - name: Wait for app and LDAP to be ready
-      run: |
-        until curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/api/heartbeat | grep -q "200"; do
-          echo "Waiting for app and LDAP to be ready..."
-          sleep 2
-        done
-        echo "App and LDAP are ready!"
+      - name: Wait for app and LDAP to be ready
+        run: |
 
-    - name: Initialize LDAP with test data
-      run: bash ./scripts/init-ldap.sh
-      working-directory: ${{ github.workspace }}
+      - name: Wait for app and LDAP to be ready
+        run: |
+          until curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/api/heartbeat | grep -q "200"; do
+            echo "Waiting for app and LDAP to be ready..."
+            sleep 2
+          done
+          echo "App and LDAP are ready!"
 
-    - name: Run Playwright API tests
-      run: npm run test:api
-      working-directory: ${{ github.workspace }}
+      - name: Initialize LDAP with test data
+        run: bash ./scripts/init-ldap.sh
+        working-directory: ${{ github.workspace }}
 
-    - name: Shutdown and cleanup
-      if: always()
-      run: docker-compose down -v
-      working-directory: ${{ github.workspace }}
+      - name: Run Playwright API tests
+        run: npm run test:api
+        working-directory: ${{ github.workspace }}
+
+      - name: Upload Playwright Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report
+
+      - name: Shutdown and cleanup
+        if: always()
+        run: docker-compose down -v
+        working-directory: ${{ github.workspace }}
 \end{lstlisting}
+
+\subsubsection{Automatisierte Ausführung durch Cronjob}
+Damit die Tests auch unabhängig von einem \texttt{push} oder \texttt{commit} ausgeführt werden, wurde die Pipeline um einen zeitbasierten Auslöser (\textit{Cronjob}) erweitert. Dadurch wird der komplette Workflow automatisch zweimal täglich gestartet – einmal morgens um 08:00 Uhr und einmal nachmittags um 16:00 Uhr (MEZ). Die Konfiguration befindet sich im oberen Bereich der Pipeline und sieht wie folgt aus:
+
+\begin{lstlisting}[language=yaml, caption={Cronjob-Integration in der GitHub Actions Pipeline}]
+on:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: '0 6 * * *'
+    - cron: '0 14 * * *'
+  workflow_dispatch:
+\end{lstlisting}
+
+
 
 
 \subsubsection{Problem während der Entwicklung: Synchronisationsfehler zwischen Applikation und LDAP}
